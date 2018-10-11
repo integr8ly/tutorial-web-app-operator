@@ -1,0 +1,16 @@
+apiVersion: "integreatly.org/v1alpha1"
+kind: "WebApp"
+metadata:
+  name: "tutorial-web-app-operator"
+  labels:
+    app: "tutorial-web-app"
+spec:
+  app_label: "tutorial-web-app"
+  template:
+    path: "/home/tutorial-web-app-operator/deploy/template/tutorial-web-app.yml"
+    parameters:
+      IMAGE: "quay.io/integreatly/tutorial-web-app"
+      IMAGE_TAG: "latest"
+      OAUTH_CLIENT_ID: "tutorial-web-app"
+      OPENSHIFT_HOST: ""
+      SSO_ROUTE: ""
