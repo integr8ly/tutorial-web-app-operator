@@ -1,3 +1,4 @@
+SHELL=/bin/bash
 REG=quay.io
 ORG=integreatly
 IMAGE=tutorial-web-app-operator
@@ -5,12 +6,22 @@ TAG=latest
 KUBE_CMD=oc apply -f
 DEPLOY_DIR=deploy
 OUT_STATIC_DIR=tmp/_output
+OUTPUT_BIN_NAME=tutorial-web-app-operator
+TARGET_BIN=cmd/tutorial-web-app-operator/main.go
 
+
+check-gofmt:
+	diff -u <(echo -n) <(gofmt -d `find . -type f -name '*.go' -not -path "./vendor/*"`)
+
+check: check-gofmt test-unit
+
+compile:
+	go build -o ${OUTPUT_BIN_NAME} ${TARGET_BIN}
 
 test-unit:
 	go test -v -race -cover ./pkg/...
 
-test: test-unit
+test: check test-unit
 
 template-copy:
 	mkdir -p ${OUT_STATIC_DIR}/deploy/template
