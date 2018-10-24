@@ -10,6 +10,9 @@ OUTPUT_BIN_NAME=tutorial-web-app-operator
 TARGET_BIN=cmd/tutorial-web-app-operator/main.go
 
 
+setup:
+	dep ensure
+
 check-gofmt:
 	diff -u <(echo -n) <(gofmt -d `find . -type f -name '*.go' -not -path "./vendor/*"`)
 
