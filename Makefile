@@ -2,7 +2,7 @@ REG=quay.io
 ORG=integreatly
 IMAGE=tutorial-web-app-operator
 TAG=latest
-KUBE_CMD=oc
+KUBE_CMD=oc apply -f
 DEPLOY_DIR=deploy
 OUT_STATIC_DIR=tmp/_output
 
@@ -25,10 +25,10 @@ push:
 	docker push ${REG}/${ORG}/${IMAGE}:${TAG}
 
 prepare:
-	${KUBE_CMD} apply -f ${DEPLOY_DIR}/rbac.yaml
-	${KUBE_CMD} apply -f ${DEPLOY_DIR}/sa.yaml
-	${KUBE_CMD} apply -f ${DEPLOY_DIR}/crd.yaml
-	${KUBE_CMD} apply -f ${DEPLOY_DIR}/cr.yaml
+	${KUBE_CMD} ${DEPLOY_DIR}/rbac.yaml
+	${KUBE_CMD} ${DEPLOY_DIR}/sa.yaml
+	${KUBE_CMD} ${DEPLOY_DIR}/crd.yaml
+	${KUBE_CMD} ${DEPLOY_DIR}/cr.yaml
 
 deploy:
-	${KUBE_CMD} apply -f ${DEPLOY_DIR}/operator.yaml
+	${KUBE_CMD} ${DEPLOY_DIR}/operator.yaml
