@@ -1,17 +1,17 @@
 package openshift
 
 import (
+	"encoding/json"
+	"fmt"
 	v1template "github.com/openshift/api/template/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/rest"
-	"encoding/json"
-	"fmt"
 )
 
-func NewTemplate(namespace string, inConfig *rest.Config,  opts TemplateOpt) (*Template, error) {
+func NewTemplate(namespace string, inConfig *rest.Config, opts TemplateOpt) (*Template, error) {
 	config := rest.CopyConfig(inConfig)
-	config.GroupVersion = &schema.GroupVersion {
+	config.GroupVersion = &schema.GroupVersion{
 		Group:   opts.ApiGroup,
 		Version: opts.ApiVersion,
 	}
@@ -29,7 +29,7 @@ func NewTemplate(namespace string, inConfig *rest.Config,  opts TemplateOpt) (*T
 		return nil, err
 	}
 
-	return &Template{namespace:namespace, RestClient:restClient}, nil
+	return &Template{namespace: namespace, RestClient: restClient}, nil
 }
 
 func (template *Template) getNS() string {
@@ -65,7 +65,7 @@ func (template *Template) Process(tmpl *v1template.Template, params map[string]s
 			return v1Temp.Objects, nil
 		}
 
-		return nil, fmt.Errorf("Wrong type returned by the server: %v",  templ)
+		return nil, fmt.Errorf("Wrong type returned by the server: %v", templ)
 	}
 
 	return nil, result.Error()

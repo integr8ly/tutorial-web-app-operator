@@ -5,23 +5,23 @@ import (
 
 	"github.com/integr8ly/tutorial-web-app-operator/pkg/apis/integreatly/v1alpha1"
 
-	"github.com/operator-framework/operator-sdk/pkg/sdk"
-	"github.com/sirupsen/logrus"
-	"github.com/integr8ly/tutorial-web-app-operator/pkg/apis/integreatly/openshift"
-	"github.com/openshift/api/template/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	"fmt"
-	"github.com/operator-framework/operator-sdk/pkg/util/k8sutil"
-	errors2 "k8s.io/apimachinery/pkg/api/errors"
-	corev1 "k8s.io/api/core/v1"
 	"errors"
+	"fmt"
+	"github.com/integr8ly/tutorial-web-app-operator/pkg/apis/integreatly/openshift"
 	"github.com/integr8ly/tutorial-web-app-operator/pkg/metrics"
+	"github.com/openshift/api/template/v1"
+	"github.com/operator-framework/operator-sdk/pkg/sdk"
+	"github.com/operator-framework/operator-sdk/pkg/util/k8sutil"
+	"github.com/sirupsen/logrus"
+	corev1 "k8s.io/api/core/v1"
+	errors2 "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
 func NewWebHandler(m *metrics.Metrics, osClient openshift.OSClient, factory ClientFactory) AppHandler {
-	return AppHandler {
-		metrics: m,
-		osClient: osClient,
+	return AppHandler{
+		metrics:                      m,
+		osClient:                     osClient,
 		dynamicResourceClientFactory: factory,
 	}
 }
@@ -88,7 +88,7 @@ func (h *AppHandler) ProcessTemplate(cr *v1alpha1.WebApp) ([]runtime.RawExtensio
 	}
 
 	params := make(map[string]string)
-	for k,v := range cr.Spec.Template.Parameters {
+	for k, v := range cr.Spec.Template.Parameters {
 		params[k] = v
 	}
 
@@ -139,7 +139,7 @@ func (h *AppHandler) ProvisionObjects(objects []runtime.Object, cr *v1alpha1.Web
 func (h *AppHandler) IsAppReady(cr *v1alpha1.WebApp) bool {
 	pod, err := h.osClient.GetPod(cr.Namespace, cr.Spec.AppLabel)
 	if err != nil {
-		return  false
+		return false
 	}
 
 	if pod.Status.Phase == corev1.PodRunning {

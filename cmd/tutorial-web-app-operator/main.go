@@ -10,12 +10,12 @@ import (
 	"github.com/operator-framework/operator-sdk/pkg/util/k8sutil"
 	sdkVersion "github.com/operator-framework/operator-sdk/version"
 
-	"github.com/sirupsen/logrus"
-	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
-	"github.com/operator-framework/operator-sdk/pkg/k8sclient"
 	"github.com/integr8ly/tutorial-web-app-operator/pkg/apis/integreatly/openshift"
 	_ "github.com/integr8ly/tutorial-web-app-operator/pkg/apis/integreatly/resources"
 	"github.com/integr8ly/tutorial-web-app-operator/pkg/metrics"
+	"github.com/operator-framework/operator-sdk/pkg/k8sclient"
+	"github.com/sirupsen/logrus"
+	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 )
 
 func printVersion() {
@@ -37,7 +37,7 @@ func main() {
 	if err != nil {
 		logrus.Fatalf("failed to get watch namespace: %v", err)
 	}
-	
+
 	osClient, err := openshift.NewOSClient(k8sclient.GetKubeClient())
 	if err != nil {
 		logrus.Fatalf("failed to initialize openshift client: %v", err)

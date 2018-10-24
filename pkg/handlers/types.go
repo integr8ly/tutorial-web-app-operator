@@ -1,14 +1,14 @@
 package handlers
 
 import (
-	"github.com/integr8ly/tutorial-web-app-operator/pkg/apis/integreatly/openshift"
-	"k8s.io/client-go/dynamic"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/integr8ly/tutorial-web-app-operator/pkg/apis/integreatly/v1alpha1"
-	"k8s.io/apimachinery/pkg/runtime"
-	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"context"
+	"github.com/integr8ly/tutorial-web-app-operator/pkg/apis/integreatly/openshift"
+	"github.com/integr8ly/tutorial-web-app-operator/pkg/apis/integreatly/v1alpha1"
 	"github.com/integr8ly/tutorial-web-app-operator/pkg/metrics"
+	"github.com/operator-framework/operator-sdk/pkg/sdk"
+	"github.com/prometheus/client_golang/prometheus"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/dynamic"
 )
 
 type Handlers struct {
@@ -28,8 +28,8 @@ type Handler interface {
 type ClientFactory func(apiVersion, kind, namespace string) (dynamic.ResourceInterface, string, error)
 
 type AppHandler struct {
-	metrics *metrics.Metrics
-	osClient openshift.OSClient
+	metrics                      *metrics.Metrics
+	osClient                     openshift.OSClient
 	dynamicResourceClientFactory ClientFactory
 }
 
