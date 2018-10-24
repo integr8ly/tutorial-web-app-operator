@@ -22,7 +22,7 @@ type WebApp struct {
 }
 
 type WebAppSpec struct {
-	AppLabel string `json:"app_label"`
+	AppLabel string         `json:"app_label"`
 	Template WebAppTemplate `json:"template"`
 }
 
@@ -31,6 +31,6 @@ type WebAppStatus struct {
 }
 
 type WebAppTemplate struct {
-	Path string `json:"path"`
+	Path       string            `json:"path"`
 	Parameters map[string]string `json:"parameters"`
 }

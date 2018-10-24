@@ -1,19 +1,19 @@
 package openshift
 
 import (
-	"testing"
-	"k8s.io/client-go/kubernetes/fake"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/api/core/v1"
 	v14fake "github.com/openshift/client-go/apps/clientset/versioned/fake"
 	v13fake "github.com/openshift/client-go/route/clientset/versioned/fake"
+	"k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/rest"
+	"testing"
 )
 
 func TestNewOSClient(t *testing.T) {
-	cases := []struct{
-		Name string
-		Client func() (*fake.Clientset)
+	cases := []struct {
+		Name        string
+		Client      func() *fake.Clientset
 		ExpectError bool
 	}{
 		{
@@ -39,14 +39,14 @@ func TestNewOSClient(t *testing.T) {
 
 func TestOSClient_Bootstrap(t *testing.T) {
 	cases := []struct {
-		Name string
-		Namespace string
-		Client func() (*fake.Clientset, rest.Config)
-		Validate func(currentNs string, expectedNs string, t *testing.T)
+		Name        string
+		Namespace   string
+		Client      func() (*fake.Clientset, rest.Config)
+		Validate    func(currentNs string, expectedNs string, t *testing.T)
 		ExpectError bool
 	}{
 		{
-			Name: "Should bootstrap osclient using the correct namespace",
+			Name:      "Should bootstrap osclient using the correct namespace",
 			Namespace: "test",
 			Client: func() (*fake.Clientset, rest.Config) {
 				return fake.NewSimpleClientset(), rest.Config{}
@@ -78,30 +78,30 @@ func TestOSClient_Bootstrap(t *testing.T) {
 }
 
 func TestOSClient_GetPod(t *testing.T) {
-	cases := []struct{
-		Name string
-		Client func() *fake.Clientset
-		Label string
+	cases := []struct {
+		Name        string
+		Client      func() *fake.Clientset
+		Label       string
 		ExpectError bool
-		Validate func(pod *v1.Pod, t *testing.T)
+		Validate    func(pod *v1.Pod, t *testing.T)
 	}{
 		{
-			Name: "should find pod",
+			Name:  "should find pod",
 			Label: "tutorial-web-app",
 			Client: func() *fake.Clientset {
-				fakeKube := fake.NewSimpleClientset(&v1.Pod {
+				fakeKube := fake.NewSimpleClientset(&v1.Pod{
 					TypeMeta: metav1.TypeMeta{
-						APIVersion:"v1",
-						Kind: "Pod",
+						APIVersion: "v1",
+						Kind:       "Pod",
 					},
 					ObjectMeta: metav1.ObjectMeta{
-						Name: "my-tutorial-pod",
+						Name:      "my-tutorial-pod",
 						Namespace: "test",
-						Labels: map[string]string {
+						Labels: map[string]string{
 							"deploymentconfig": "tutorial-web-app",
 						},
 					},
-					Status: v1.PodStatus {
+					Status: v1.PodStatus{
 						Phase: v1.PodRunning,
 						PodIP: "172.1.0.3",
 					},
@@ -110,7 +110,7 @@ func TestOSClient_GetPod(t *testing.T) {
 				return fakeKube
 			},
 			Validate: func(pod *v1.Pod, t *testing.T) {
-				val, ok := pod.Labels["deploymentconfig"];
+				val, ok := pod.Labels["deploymentconfig"]
 
 				if pod.Name != "my-tutorial-pod" {
 					t.Fatalf("Pod name didn't match: %v", pod)
@@ -128,18 +128,18 @@ func TestOSClient_GetPod(t *testing.T) {
 			ExpectError: false,
 		},
 		{
-			Name: "should not find pod",
+			Name:  "should not find pod",
 			Label: "tutorial-web-ap",
 			Client: func() *fake.Clientset {
-				fakeKube := fake.NewSimpleClientset(&v1.Pod {
+				fakeKube := fake.NewSimpleClientset(&v1.Pod{
 					TypeMeta: metav1.TypeMeta{
-						APIVersion:"v1",
-						Kind: "Pod",
+						APIVersion: "v1",
+						Kind:       "Pod",
 					},
 					ObjectMeta: metav1.ObjectMeta{
 						Namespace: "test",
 					},
-					Status: v1.PodStatus {
+					Status: v1.PodStatus{
 						Phase: v1.PodRunning,
 						PodIP: "172.1.0.3",
 					},
@@ -148,7 +148,7 @@ func TestOSClient_GetPod(t *testing.T) {
 				return fakeKube
 			},
 			Validate: func(pod *v1.Pod, t *testing.T) {
-				_, ok := pod.Labels["deploymentconfig"];
+				_, ok := pod.Labels["deploymentconfig"]
 
 				if ok {
 					t.Fatalf("Pod should not have a deploymentconfig label: %v", pod)
@@ -178,10 +178,10 @@ func TestOSClient_GetPod(t *testing.T) {
 }
 
 func TestOSClient_Delete(t *testing.T) {
-	cases := []struct{
-		Name string
-		Client func() (*fake.Clientset, *v13fake.Clientset,*v14fake.Clientset)
-		Label string
+	cases := []struct {
+		Name        string
+		Client      func() (*fake.Clientset, *v13fake.Clientset, *v14fake.Clientset)
+		Label       string
 		ExpectError bool
 	}{
 		{
@@ -205,7 +205,7 @@ func TestOSClient_Delete(t *testing.T) {
 
 				return fakeKube, fakeRoute, fakeApp
 			},
-			Label: "tutorial-web-app",
+			Label:       "tutorial-web-app",
 			ExpectError: false,
 		},
 		{
@@ -229,7 +229,7 @@ func TestOSClient_Delete(t *testing.T) {
 
 				return fakeKube, fakeRoute, fakeApp
 			},
-			Label: "tutorial-web-ap",
+			Label:       "tutorial-web-ap",
 			ExpectError: true,
 		},
 	}
@@ -237,10 +237,10 @@ func TestOSClient_Delete(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {
 			kubeClient, routeClient, appClient := tc.Client()
-			client := OSClient {
-				kubeClient: kubeClient,
-				ocDCClient:appClient.AppsV1(),
-				ocRouteClient:routeClient.RouteV1(),
+			client := OSClient{
+				kubeClient:    kubeClient,
+				ocDCClient:    appClient.AppsV1(),
+				ocRouteClient: routeClient.RouteV1(),
 			}
 
 			err := client.Delete("test", tc.Label)

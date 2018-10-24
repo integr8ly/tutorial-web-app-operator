@@ -1,19 +1,19 @@
 package openshift
 
 import (
-	"testing"
 	"io/ioutil"
+	"testing"
 )
 
 func TestLoadKubernetesResourceFromFile(t *testing.T) {
 	cases := []struct {
-		Name string
-		FilePath string
-		Resource func(path string) error
+		Name        string
+		FilePath    string
+		Resource    func(path string) error
 		ExpectError bool
 	}{
 		{
-			Name: "Should open and parse yaml file",
+			Name:     "Should open and parse yaml file",
 			FilePath: "_testdata/test-template.yaml",
 			Resource: func(path string) error {
 				_, err := LoadKubernetesResourceFromFile(path)
@@ -23,7 +23,7 @@ func TestLoadKubernetesResourceFromFile(t *testing.T) {
 			ExpectError: false,
 		},
 		{
-			Name: "Should open and parse json file",
+			Name:     "Should open and parse json file",
 			FilePath: "_testdata/test-template.json",
 			Resource: func(path string) error {
 				_, err := LoadKubernetesResourceFromFile(path)
@@ -33,7 +33,7 @@ func TestLoadKubernetesResourceFromFile(t *testing.T) {
 			ExpectError: false,
 		},
 		{
-			Name: "Should fail to find template file",
+			Name:     "Should fail to find template file",
 			FilePath: "_testdata/test-template",
 			Resource: func(path string) error {
 				_, err := LoadKubernetesResourceFromFile(path)
@@ -43,7 +43,7 @@ func TestLoadKubernetesResourceFromFile(t *testing.T) {
 			ExpectError: true,
 		},
 		{
-			Name: "Should fail to find template file",
+			Name:     "Should fail to find template file",
 			FilePath: "_testdata/test-invalid-template.json",
 			Resource: func(path string) error {
 				_, err := LoadKubernetesResourceFromFile(path)
@@ -54,7 +54,7 @@ func TestLoadKubernetesResourceFromFile(t *testing.T) {
 		},
 	}
 
-	for _,tc := range cases {
+	for _, tc := range cases {
 		err := tc.Resource(tc.FilePath)
 
 		if tc.ExpectError && err == nil {
@@ -68,14 +68,14 @@ func TestLoadKubernetesResourceFromFile(t *testing.T) {
 }
 
 func TestJsonIfYaml(t *testing.T) {
-	cases := []struct{
-		Name string
-		FilePath string
-		Content func(path string) []byte
+	cases := []struct {
+		Name        string
+		FilePath    string
+		Content     func(path string) []byte
 		ExpectError bool
 	}{
 		{
-			Name: "Should parse yaml file",
+			Name:     "Should parse yaml file",
 			FilePath: "_testdata/test-template.yaml",
 			Content: func(path string) []byte {
 				rawData, err := ioutil.ReadFile(path)
@@ -88,7 +88,7 @@ func TestJsonIfYaml(t *testing.T) {
 			ExpectError: false,
 		},
 		{
-			Name: "Should parse json file",
+			Name:     "Should parse json file",
 			FilePath: "_testdata/test-template.json",
 			Content: func(path string) []byte {
 				rawData, err := ioutil.ReadFile(path)
@@ -101,7 +101,7 @@ func TestJsonIfYaml(t *testing.T) {
 			ExpectError: false,
 		},
 		{
-			Name: "Should fail to find template file",
+			Name:     "Should fail to find template file",
 			FilePath: "_testdata/test-invalid-template.jso",
 			Content: func(path string) []byte {
 				rawData, err := ioutil.ReadFile(path)
