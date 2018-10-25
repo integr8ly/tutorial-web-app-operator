@@ -1,6 +1,6 @@
 # tutorial-web-app-operator
 
-Openshift operator that handles integreatly tutotirla-web-app deployments.
+Openshift operator that handles integreatly tutorial-web-app deployments.
 
 [![Build Status](https://travis-ci.org/integr8ly/tutorial-web-app-operator.svg?branch=master)](https://travis-ci.org/integr8ly/tutorial-web-app-operator)
 
