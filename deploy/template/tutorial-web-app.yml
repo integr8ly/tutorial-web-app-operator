@@ -16,7 +16,7 @@ parameters:
     value: quay.io/integreatly/tutorial-web-app
     required: true
   - name: WEBAPP_IMAGE_TAG
-    value: latest
+    value: master
     required: true
   - name: FUSE_URL
     description: Mock URL for Fuse. Only used if OPENSHIFT_HOST is empty
