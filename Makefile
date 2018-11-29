@@ -6,7 +6,7 @@ TAG=latest
 KUBE_CMD=oc apply -f
 DEPLOY_DIR=deploy
 OUT_STATIC_DIR=tmp/_output
-OUTPUT_BIN_NAME=tutorial-web-app-operator
+OUTPUT_BIN_NAME=./tmp/_output/bin/tutorial-web-app-operator
 TARGET_BIN=cmd/tutorial-web-app-operator/main.go
 
 
@@ -54,3 +54,13 @@ prepare:
 
 deploy:
 	${KUBE_CMD} ${DEPLOY_DIR}/operator.yaml
+
+.PHONY: docker-build-image
+docker-build-image: docker-build
+
+.PHONY: docker-build
+docker-build: template-copy compile
+	docker build -t quay.io/${ORG}/${IMAGE}:${TAG} -f tmp/build/Dockerfile .
+
+docker-build-and-push: docker-build push
+
