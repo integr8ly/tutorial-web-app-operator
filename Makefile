@@ -27,7 +27,7 @@ check-gofmt:
 check: check-gofmt test-unit
 
 compile:
-	go build -o ${OUTPUT_BIN_NAME} ${TARGET_BIN}
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${OUTPUT_BIN_NAME} ${TARGET_BIN}
 
 test-unit:
 	go test -v -race -cover ./pkg/...
