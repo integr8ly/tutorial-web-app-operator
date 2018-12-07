@@ -33,6 +33,9 @@ parameters:
   - name: SSO_ROUTE
     description: Openshift SSO URL
     required: false
+  - name: WALKTHROUGH_LOCATIONS
+    description: A comma separated list of git repositories or paths to walkthrough directories
+    required: true
 objects:
 - apiVersion: v1
   kind: DeploymentConfig
@@ -68,6 +71,8 @@ objects:
             value: production
           - name: SSO_ROUTE
             value: ${SSO_ROUTE}
+          - name: WALKTHROUGH_LOCATIONS
+            value: ${WALKTHROUGH_LOCATIONS}
           image: ${WEBAPP_IMAGE}:${WEBAPP_IMAGE_TAG}
           imagePullPolicy: Always
           name: tutorial-web-app
