@@ -28,6 +28,7 @@ type WebAppSpec struct {
 
 type WebAppStatus struct {
 	Message string `json:"message"`
+	Version string `json:"version"`
 }
 
 type WebAppTemplate struct {
