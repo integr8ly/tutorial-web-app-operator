@@ -7,6 +7,7 @@ import (
 
 	"errors"
 	"fmt"
+
 	"github.com/integr8ly/tutorial-web-app-operator/pkg/apis/integreatly/openshift"
 	"github.com/integr8ly/tutorial-web-app-operator/pkg/metrics"
 	"github.com/openshift/api/template/v1"
@@ -77,6 +78,7 @@ func (h *AppHandler) Delete(cr *v1alpha1.WebApp) error {
 
 func (h *AppHandler) SetStatus(msg string, cr *v1alpha1.WebApp) {
 	cr.Status.Message = msg
+	cr.Status.Version = cr.Spec.Template.Parameters["WEBAPP_IMAGE_TAG"]
 	sdk.Update(cr)
 }
 
