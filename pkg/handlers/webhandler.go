@@ -19,6 +19,10 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
+const (
+	WebappVersion = "master"
+)
+
 func NewWebHandler(m *metrics.Metrics, osClient openshift.OSClient, factory ClientFactory) AppHandler {
 	return AppHandler{
 		metrics:                      m,
@@ -78,7 +82,7 @@ func (h *AppHandler) Delete(cr *v1alpha1.WebApp) error {
 
 func (h *AppHandler) SetStatus(msg string, cr *v1alpha1.WebApp) {
 	cr.Status.Message = msg
-	cr.Status.Version = cr.Spec.Template.Parameters["WEBAPP_IMAGE_TAG"]
+	cr.Status.Version = WebappVersion
 	sdk.Update(cr)
 }
 

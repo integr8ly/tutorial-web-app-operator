@@ -12,12 +12,6 @@ parameters:
     description: The OpenShift master/api host e.g. openshift.example.com:8443. If blank, mock data (and mock service URL params) will be used.
     displayName: OpenShift Host
     required: false
-  - name: WEBAPP_IMAGE
-    value: quay.io/integreatly/tutorial-web-app
-    required: true
-  - name: WEBAPP_IMAGE_TAG
-    value: master
-    required: true
   - name: FUSE_URL
     description: Mock URL for Fuse. Only used if OPENSHIFT_HOST is empty
     required: false
@@ -73,7 +67,7 @@ objects:
             value: ${SSO_ROUTE}
           - name: WALKTHROUGH_LOCATIONS
             value: ${WALKTHROUGH_LOCATIONS}
-          image: ${WEBAPP_IMAGE}:${WEBAPP_IMAGE_TAG}
+          image: quay.io/integreatly/tutorial-web-app:master
           imagePullPolicy: Always
           name: tutorial-web-app
           ports:
