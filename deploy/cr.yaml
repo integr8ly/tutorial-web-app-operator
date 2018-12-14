@@ -9,8 +9,6 @@ spec:
   template:
     path: "/home/tutorial-web-app-operator/deploy/template/tutorial-web-app.yml"
     parameters:
-      WEBAPP_IMAGE: "quay.io/integreatly/tutorial-web-app"
-      WEBAPP_IMAGE_TAG: "latest"
       OPENSHIFT_OAUTHCLIENT_ID: "tutorial-web-app"
       OPENSHIFT_HOST: ""
       SSO_ROUTE: ""
