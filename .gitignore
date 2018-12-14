@@ -1,5 +1,4 @@
 
-vendor/golang.org
 .idea
 *.swp
 tmp/

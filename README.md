@@ -15,24 +15,23 @@ Openshift operator that handles integreatly tutorial-web-app deployments.
 
 ```sh
 #create required resources
-make prepare
+make cluster/prepare
 #deploys the operator itself
-make -B deploy
+make -B cluster/deploy
 ```
 
 ## Building
 
 ```sh
 #builds image: quay.io/integreatly/tutorial-web-app-operator:latest
-make build
+make image/build
 
 #custom image params: registry.io/myusername/image-name:dev
-make BUILD REG=custom-registry.io ORG=myusername IMAGE=image-name TAG=dev 
+make image/build REG=custom-registry.io ORG=myusername IMAGE=image-name TAG=dev
 ```
 
 ## Running tests
 
 ```
-#Runs both gofmt checks and unit tests
-make test
+make test/unit
 ```
