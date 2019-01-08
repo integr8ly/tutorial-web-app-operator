@@ -12,4 +12,3 @@ spec:
       OPENSHIFT_OAUTHCLIENT_ID: "tutorial-web-app"
       OPENSHIFT_HOST: ""
       SSO_ROUTE: ""
-      WALKTHROUGH_LOCATIONS: "https://github.com/integr8ly/tutorial-web-app-walkthroughs.git"
