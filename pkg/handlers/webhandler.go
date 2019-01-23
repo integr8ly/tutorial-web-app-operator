@@ -49,23 +49,24 @@ func (h *AppHandler) Handle(ctx context.Context, event sdk.Event) error {
 			h.SetStatus(err.Error(), o)
 			return err
 		}
-
 		runtimeObjs, err := h.GetRuntimeObjs(exts)
 		if err != nil {
 			logrus.Errorf("Error parsing the runtime objects from the template: %v", err)
 			h.SetStatus(err.Error(), o)
 			return err
 		}
-
 		err = h.ProvisionObjects(runtimeObjs, o)
 		if err != nil {
 			logrus.Errorf("Error provisioning the runtime objects: %v", err)
 			h.SetStatus(err.Error(), o)
 			return err
 		}
-
 		if h.IsAppReady(o) {
-			h.SetStatus("OK", o)
+			if err := h.reconcile(o); err != nil {
+				h.SetStatus("Error: " + err.Error(), o)
+			} else {
+				h.SetStatus("OK", o)
+			}
 		} else {
 			h.SetStatus("", o)
 		}
@@ -74,6 +75,55 @@ func (h *AppHandler) Handle(ctx context.Context, event sdk.Event) error {
 	}
 
 	return nil
+}
+
+func (h *AppHandler) reconcile(cr *v1alpha1.WebApp) error {
+	//reconcile template params into deployment config
+	dc, err := h.osClient.GetDC(cr.Namespace, "tutorial-web-app")
+	if err != nil {
+		return err
+	}
+	dcUpdated := false
+	for _, param := range []string{"OPENSHIFT_OAUTHCLIENT_ID", "OPENSHIFT_HOST", "SSO_ROUTE", "WALKTHROUGH_LOCATIONS"} {
+		if val, ok := cr.Spec.Template.Parameters[param]; ok {
+			dcUpdated, dc.Spec.Template.Spec.Containers[0] = updateOrCreateEnvVar(dc.Spec.Template.Spec.Containers[0], param, val)
+		} else {
+			//key does not exist in CR, ensure it is not present in the DC
+			dcUpdated, dc.Spec.Template.Spec.Containers[0] = deleteEnvVar(dc.Spec.Template.Spec.Containers[0], param)
+		}
+	}
+	//update the DC
+	if dcUpdated {
+		return h.osClient.UpdateDC(cr.Namespace, &dc)
+	}
+	return nil
+}
+
+func deleteEnvVar(container corev1.Container, envName string) (bool, corev1.Container) {
+	for k, envVar := range container.Env {
+		if envVar.Name == envName {
+			container.Env = append(container.Env[:k], container.Env[k+1:]...)
+			return true, container
+		}
+	}
+	return false, container
+}
+func updateOrCreateEnvVar(container corev1.Container, envName, envVal string) (bool, corev1.Container) {
+	for envIndex, envVar := range container.Env {
+		if envVar.Name == envName {
+			if envVar.Value != envVal {
+				// update env var with correct value
+				container.Env[envIndex].Value = envVal
+				return true, container
+			}
+			return false, container
+		}
+	}
+
+	//create new env var with correct value
+	container.Env = append(container.Env, corev1.EnvVar{Name: envName, Value: envVal})
+
+	return true, container
 }
 
 func (h *AppHandler) Delete(cr *v1alpha1.WebApp) error {

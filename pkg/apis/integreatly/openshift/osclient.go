@@ -3,6 +3,7 @@ package openshift
 import (
 	"errors"
 	appsv1 "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
+	osappsv1 "github.com/openshift/api/apps/v1"
 	routev1 "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
 	"k8s.io/api/core/v1"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -37,6 +38,25 @@ func (osClient *OSClient) Bootstrap(namespace string, kubeconfig *rest.Config) e
 	osClient.TmplHandler = tmpl
 
 	return nil
+}
+
+func (osClient *OSClient) GetDC(ns string, dcName string) (osappsv1.DeploymentConfig, error) {
+	dcs, err := osClient.ocDCClient.DeploymentConfigs(ns).List(meta_v1.ListOptions{})
+	if err != nil {
+		return osappsv1.DeploymentConfig{}, err
+	}
+	for _, dc := range dcs.Items {
+		if dc.Name == dcName {
+			return dc, nil
+		}
+	}
+
+	return osappsv1.DeploymentConfig{}, errors.New("deployment config not found: '" + dcName + "'")
+}
+
+func (osClient *OSClient) UpdateDC(ns string, dc *osappsv1.DeploymentConfig) error {
+	_, err := osClient.ocDCClient.DeploymentConfigs(ns).Update(dc)
+	return err
 }
 
 func (osClient *OSClient) GetPod(ns string, dc string) (v1.Pod, error) {
