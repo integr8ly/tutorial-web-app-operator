@@ -2,10 +2,10 @@ package openshift
 
 import (
 	v12 "github.com/openshift/api/apps/v1"
-	appsfake "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1/fake"
-	routefake "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1/fake"
-	routeclientfake "github.com/openshift/client-go/route/clientset/versioned/fake"
 	appsclientfake "github.com/openshift/client-go/apps/clientset/versioned/fake"
+	appsfake "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1/fake"
+	routeclientfake "github.com/openshift/client-go/route/clientset/versioned/fake"
+	routefake "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1/fake"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
@@ -142,7 +142,6 @@ func TestOSClient_GetPod(t *testing.T) {
 	}
 }
 
-
 func TestOSClient_GetDc(t *testing.T) {
 	cases := []struct {
 		Name        string
@@ -164,8 +163,8 @@ func TestOSClient_GetDc(t *testing.T) {
 					},
 					ObjectMeta: metav1.ObjectMeta{
 						Namespace: "test",
-						Name: "my-tutorial-dc",
-						Labels:  map[string]string{
+						Name:      "my-tutorial-dc",
+						Labels: map[string]string{
 							"app": "my-tutorial-dc",
 						},
 					},
@@ -207,7 +206,7 @@ func TestOSClient_GetDc(t *testing.T) {
 			}
 
 			dc, err := client.GetDC("test", tc.DcName)
-			if err != nil && tc.ExpectError != true{
+			if err != nil && tc.ExpectError != true {
 				panic(err)
 			}
 			if err == nil && tc.ExpectError == true {

@@ -14,11 +14,11 @@ import (
 	"github.com/integr8ly/tutorial-web-app-operator/pkg/apis/integreatly/openshift"
 	_ "github.com/integr8ly/tutorial-web-app-operator/pkg/apis/integreatly/resources"
 	"github.com/integr8ly/tutorial-web-app-operator/pkg/metrics"
+	appsv1 "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
+	routev1 "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
 	"github.com/operator-framework/operator-sdk/pkg/k8sclient"
 	"github.com/sirupsen/logrus"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
-	appsv1 "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
-	routev1 "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
 )
 
 func printVersion() {

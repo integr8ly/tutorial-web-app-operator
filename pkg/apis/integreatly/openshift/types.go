@@ -12,7 +12,6 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-
 //go:generate moq -out OSClientInterface_moq.go . OSClientInterface
 
 type OSClientInterface interface {

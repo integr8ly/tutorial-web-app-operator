@@ -23,7 +23,7 @@ func TestReconcile(t *testing.T) {
 		OSClient        func() *openshift.OSClientInterfaceMock
 		SDKCruder       func() SdkCruder
 		ExpectedMessage string
-		Verify func(*v1alpha1.WebApp, *testing.T)
+		Verify          func(*v1alpha1.WebApp, *testing.T)
 	}{
 		{
 			Name: "Update DC",
@@ -118,7 +118,7 @@ func TestReconcile(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		t.Run(tc.Name, func(t *testing.T){
+		t.Run(tc.Name, func(t *testing.T) {
 			osClient := tc.OSClient()
 			wh := NewWebHandler(nil, osClient, MockGetResourcesClient, tc.SDKCruder())
 			wh.Handle(context.TODO(), tc.Event)

@@ -14,10 +14,10 @@ import (
 
 func NewOSClient(kubeClient kubernetes.Interface, routeClient routev1.RouteV1Interface, dcClient appsv1.AppsV1Interface, tmpl TemplateHandler) (*OSClient, error) {
 	return &OSClient{
-		kubeClient: kubeClient,
+		kubeClient:    kubeClient,
 		ocRouteClient: routeClient,
-		ocDCClient: dcClient,
-		TmplHandler: tmpl,
+		ocDCClient:    dcClient,
+		TmplHandler:   tmpl,
 	}, nil
 }
 

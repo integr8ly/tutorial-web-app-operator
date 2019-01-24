@@ -4,10 +4,10 @@
 package openshift
 
 import (
-	"k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	appsv1 "github.com/openshift/api/apps/v1"
 	tmplv1 "github.com/openshift/api/template/v1"
+	"k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"sync"
 )
 

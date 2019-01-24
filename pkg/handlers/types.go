@@ -15,7 +15,6 @@ type Handlers struct {
 	WebAppHandler Handler
 }
 
-
 //go:generate moq -out sdkCruder_moq.go . SdkCruder
 
 type SdkCruder interface {
@@ -42,7 +41,7 @@ type AppHandler struct {
 	metrics                      *metrics.Metrics
 	osClient                     openshift.OSClientInterface
 	dynamicResourceClientFactory ClientFactory
-	sdkCruder 					 SdkCruder
+	sdkCruder                    SdkCruder
 }
 
 type Metrics struct {

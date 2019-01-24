@@ -25,15 +25,12 @@ const (
 
 var webappParams = [...]string{"OPENSHIFT_OAUTHCLIENT_ID", "OPENSHIFT_HOST", "SSO_ROUTE", "WALKTHROUGH_LOCATIONS"}
 
-
-
-
 func NewWebHandler(m *metrics.Metrics, osClient openshift.OSClientInterface, factory ClientFactory, cruder SdkCruder) AppHandler {
 	return AppHandler{
 		metrics:                      m,
 		osClient:                     osClient,
 		dynamicResourceClientFactory: factory,
-		sdkCruder: 					  cruder,
+		sdkCruder:                    cruder,
 	}
 }
 
@@ -106,7 +103,7 @@ func (h *AppHandler) reconcile(cr *v1alpha1.WebApp) error {
 			//key does not exist in CR, ensure it is not present in the DC
 			updated, dc.Spec.Template.Spec.Containers[0] = deleteEnvVar(dc.Spec.Template.Spec.Containers[0], param)
 		}
-		if updated && ! dcUpdated {
+		if updated && !dcUpdated {
 			dcUpdated = true
 		}
 	}
