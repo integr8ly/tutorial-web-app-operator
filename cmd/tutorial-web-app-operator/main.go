@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/integr8ly/tutorial-web-app-operator/pkg/k8s"
 	"runtime"
 	"time"
 
@@ -13,6 +14,8 @@ import (
 	"github.com/integr8ly/tutorial-web-app-operator/pkg/apis/integreatly/openshift"
 	_ "github.com/integr8ly/tutorial-web-app-operator/pkg/apis/integreatly/resources"
 	"github.com/integr8ly/tutorial-web-app-operator/pkg/metrics"
+	appsv1 "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
+	routev1 "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
 	"github.com/operator-framework/operator-sdk/pkg/k8sclient"
 	"github.com/sirupsen/logrus"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
@@ -38,17 +41,28 @@ func main() {
 		logrus.Fatalf("failed to get watch namespace: %v", err)
 	}
 
-	osClient, err := openshift.NewOSClient(k8sclient.GetKubeClient())
+	routeClient, err := routev1.NewForConfig(k8sclient.GetKubeConfig())
+	if err != nil {
+		panic(err)
+	}
+
+	dcClient, err := appsv1.NewForConfig(k8sclient.GetKubeConfig())
+	if err != nil {
+		panic(err)
+	}
+
+	tmpl, err := openshift.NewTemplate(namespace, k8sclient.GetKubeConfig(), openshift.TemplateDefaultOpts)
+	if err != nil {
+		panic(err)
+	}
+
+	osClient, err := openshift.NewOSClient(k8sclient.GetKubeClient(), routeClient, dcClient, tmpl)
 	if err != nil {
 		logrus.Fatalf("failed to initialize openshift client: %v", err)
 	}
 
-	err = osClient.Bootstrap(namespace, k8sclient.GetKubeConfig())
-	if err != nil {
-		logrus.Fatalf("failed to bootstrap openshift client: %v", err)
-	}
-
-	webAppHandler := handlers.NewWebHandler(metrics, osClient, k8sclient.GetResourceClient)
+	cruder := k8s.Cruder{}
+	webAppHandler := handlers.NewWebHandler(metrics, osClient, k8sclient.GetResourceClient, cruder)
 	handlers := handlers.NewHandler(&webAppHandler)
 	resource := "integreatly.org/v1alpha1"
 	kind := "WebApp"

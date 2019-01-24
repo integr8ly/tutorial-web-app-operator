@@ -75,9 +75,6 @@ objects:
           - containerPort: 5001
             name: http
             protocol: TCP
-      metadata:
-        labels:
-          app: tutorial-web-app
     triggers:
       - type: ConfigChange
 - apiVersion: v1
