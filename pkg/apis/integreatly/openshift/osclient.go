@@ -2,56 +2,37 @@ package openshift
 
 import (
 	"errors"
-	appsv1 "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
 	osappsv1 "github.com/openshift/api/apps/v1"
+	v12 "github.com/openshift/api/template/v1"
+	appsv1 "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
 	routev1 "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
 	"k8s.io/api/core/v1"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
 )
 
-func NewOSClient(kubeClient kubernetes.Interface) (OSClient, error) {
-	return OSClient{
+func NewOSClient(kubeClient kubernetes.Interface, routeClient routev1.RouteV1Interface, dcClient appsv1.AppsV1Interface, tmpl TemplateHandler) (*OSClient, error) {
+	return &OSClient{
 		kubeClient: kubeClient,
+		ocRouteClient: routeClient,
+		ocDCClient: dcClient,
+		TmplHandler: tmpl,
 	}, nil
 }
 
-func (osClient *OSClient) Bootstrap(namespace string, kubeconfig *rest.Config) error {
-	routeClient, err := routev1.NewForConfig(kubeconfig)
-	if err != nil {
-		return err
-	}
-	osClient.ocRouteClient = routeClient
-
-	dcClient, err := appsv1.NewForConfig(kubeconfig)
-	if err != nil {
-		return err
-	}
-	osClient.ocDCClient = dcClient
-
-	tmpl, err := NewTemplate(namespace, kubeconfig, TemplateDefaultOpts)
-	if err != nil {
-		return err
-	}
-
-	osClient.TmplHandler = tmpl
-
-	return nil
-}
-
 func (osClient *OSClient) GetDC(ns string, dcName string) (osappsv1.DeploymentConfig, error) {
-	dcs, err := osClient.ocDCClient.DeploymentConfigs(ns).List(meta_v1.ListOptions{})
+	dc, err := osClient.ocDCClient.DeploymentConfigs(ns).Get(dcName, meta_v1.GetOptions{})
 	if err != nil {
 		return osappsv1.DeploymentConfig{}, err
 	}
-	for _, dc := range dcs.Items {
-		if dc.Name == dcName {
-			return dc, nil
-		}
-	}
 
-	return osappsv1.DeploymentConfig{}, errors.New("deployment config not found: '" + dcName + "'")
+	return *dc, nil
+
+}
+
+func (osClient *OSClient) ProcessTemplate(tmpl *v12.Template, params map[string]string, TemplateDefaultOpts TemplateOpt) ([]runtime.RawExtension, error) {
+	return osClient.TmplHandler.Process(tmpl, params, TemplateDefaultOpts)
 }
 
 func (osClient *OSClient) UpdateDC(ns string, dc *osappsv1.DeploymentConfig) error {

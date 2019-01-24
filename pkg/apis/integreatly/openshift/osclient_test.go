@@ -1,8 +1,11 @@
 package openshift
 
 import (
-	v14fake "github.com/openshift/client-go/apps/clientset/versioned/fake"
-	v13fake "github.com/openshift/client-go/route/clientset/versioned/fake"
+	v12 "github.com/openshift/api/apps/v1"
+	appsfake "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1/fake"
+	routefake "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1/fake"
+	routeclientfake "github.com/openshift/client-go/route/clientset/versioned/fake"
+	appsclientfake "github.com/openshift/client-go/apps/clientset/versioned/fake"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
@@ -26,44 +29,8 @@ func TestNewOSClient(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		_, err := NewOSClient(tc.Client())
-		if tc.ExpectError && err == nil {
-			t.Fatalf("expected an error but got none")
-		}
-
-		if !tc.ExpectError && err != nil {
-			t.Fatalf("did not expect error but got %s ", err)
-		}
-	}
-}
-
-func TestOSClient_Bootstrap(t *testing.T) {
-	cases := []struct {
-		Name        string
-		Namespace   string
-		Client      func() (*fake.Clientset, rest.Config)
-		Validate    func(currentNs string, expectedNs string, t *testing.T)
-		ExpectError bool
-	}{
-		{
-			Name:      "Should bootstrap osclient using the correct namespace",
-			Namespace: "test",
-			Client: func() (*fake.Clientset, rest.Config) {
-				return fake.NewSimpleClientset(), rest.Config{}
-			},
-			Validate: func(currentNs string, expectedNs string, t *testing.T) {
-				if currentNs != expectedNs {
-					t.Fatalf("Current NS: %s, expected NS: %s", currentNs, expectedNs)
-				}
-			},
-			ExpectError: false,
-		},
-	}
-
-	for _, tc := range cases {
-		kubeClient, cfg := tc.Client()
-		client := OSClient{kubeClient: kubeClient}
-		err := client.Bootstrap(tc.Namespace, &cfg)
+		tmpl, err := NewTemplate("test", &rest.Config{}, TemplateDefaultOpts)
+		_, err = NewOSClient(tc.Client(), &routefake.FakeRouteV1{}, &appsfake.FakeAppsV1{}, tmpl)
 
 		if tc.ExpectError && err == nil {
 			t.Fatalf("expected an error but got none")
@@ -72,8 +39,6 @@ func TestOSClient_Bootstrap(t *testing.T) {
 		if !tc.ExpectError && err != nil {
 			t.Fatalf("did not expect error but got %s ", err)
 		}
-
-		tc.Validate(client.TmplHandler.getNS(), tc.Namespace, t)
 	}
 }
 
@@ -177,16 +142,92 @@ func TestOSClient_GetPod(t *testing.T) {
 	}
 }
 
+
+func TestOSClient_GetDc(t *testing.T) {
+	cases := []struct {
+		Name        string
+		Client      func() (*fake.Clientset, *routeclientfake.Clientset, *appsclientfake.Clientset)
+		DcName      string
+		ExpectError bool
+		Validate    func(dc *v12.DeploymentConfig, t *testing.T)
+	}{
+		{
+			Name:   "should find dc",
+			DcName: "my-tutorial-dc",
+			Client: func() (*fake.Clientset, *routeclientfake.Clientset, *appsclientfake.Clientset) {
+				fakeKube := fake.NewSimpleClientset()
+				fakeRoute := routeclientfake.NewSimpleClientset()
+				fakeApp := appsclientfake.NewSimpleClientset(&v12.DeploymentConfig{
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "apps.openshift.io/v1",
+						Kind:       "DeploymentConfig",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Namespace: "test",
+						Name: "my-tutorial-dc",
+						Labels:  map[string]string{
+							"app": "my-tutorial-dc",
+						},
+					},
+				})
+
+				return fakeKube, fakeRoute, fakeApp
+			},
+			Validate: func(dc *v12.DeploymentConfig, t *testing.T) {
+				if dc.Name != "my-tutorial-dc" {
+					t.Fatalf("dc name didn't match: %v", dc)
+				}
+			},
+			ExpectError: false,
+		},
+		{
+			Name:   "should not find pod",
+			DcName: "tutorial-web-ap",
+			Client: func() (*fake.Clientset, *routeclientfake.Clientset, *appsclientfake.Clientset) {
+				fakeKube := fake.NewSimpleClientset()
+				fakeRoute := routeclientfake.NewSimpleClientset()
+				fakeApp := appsclientfake.NewSimpleClientset()
+				return fakeKube, fakeRoute, fakeApp
+			},
+			Validate: func(dc *v12.DeploymentConfig, t *testing.T) {
+				if dc.Name != "" {
+					t.Fatal("found a dc, expected none")
+				}
+			},
+			ExpectError: true,
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.Name, func(t *testing.T) {
+			_, routeClient, appClient := tc.Client()
+			client := OSClient{
+				ocDCClient:    appClient.AppsV1(),
+				ocRouteClient: routeClient.RouteV1(),
+			}
+
+			dc, err := client.GetDC("test", tc.DcName)
+			if err != nil && tc.ExpectError != true{
+				panic(err)
+			}
+			if err == nil && tc.ExpectError == true {
+				t.Fatalf("Expected error and got nil")
+			}
+			tc.Validate(&dc, t)
+		})
+	}
+}
+
 func TestOSClient_Delete(t *testing.T) {
 	cases := []struct {
 		Name        string
-		Client      func() (*fake.Clientset, *v13fake.Clientset, *v14fake.Clientset)
+		Client      func() (*fake.Clientset, *routeclientfake.Clientset, *appsclientfake.Clientset)
 		Label       string
 		ExpectError bool
 	}{
 		{
 			Name: "Should delete resources",
-			Client: func() (*fake.Clientset, *v13fake.Clientset, *v14fake.Clientset) {
+			Client: func() (*fake.Clientset, *routeclientfake.Clientset, *appsclientfake.Clientset) {
 				fakeKube := fake.NewSimpleClientset(&v1.Service{
 					TypeMeta: metav1.TypeMeta{
 						APIVersion: "v1",
@@ -200,8 +241,8 @@ func TestOSClient_Delete(t *testing.T) {
 						},
 					},
 				})
-				fakeRoute := v13fake.NewSimpleClientset()
-				fakeApp := v14fake.NewSimpleClientset()
+				fakeRoute := routeclientfake.NewSimpleClientset()
+				fakeApp := appsclientfake.NewSimpleClientset()
 
 				return fakeKube, fakeRoute, fakeApp
 			},
@@ -210,7 +251,7 @@ func TestOSClient_Delete(t *testing.T) {
 		},
 		{
 			Name: "Should not delete resources",
-			Client: func() (*fake.Clientset, *v13fake.Clientset, *v14fake.Clientset) {
+			Client: func() (*fake.Clientset, *routeclientfake.Clientset, *appsclientfake.Clientset) {
 				fakeKube := fake.NewSimpleClientset(&v1.Service{
 					TypeMeta: metav1.TypeMeta{
 						APIVersion: "v1",
@@ -224,8 +265,8 @@ func TestOSClient_Delete(t *testing.T) {
 						},
 					},
 				})
-				fakeRoute := v13fake.NewSimpleClientset()
-				fakeApp := v14fake.NewSimpleClientset()
+				fakeRoute := routeclientfake.NewSimpleClientset()
+				fakeApp := appsclientfake.NewSimpleClientset()
 
 				return fakeKube, fakeRoute, fakeApp
 			},

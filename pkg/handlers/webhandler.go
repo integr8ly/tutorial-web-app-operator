@@ -23,11 +23,17 @@ const (
 	WebappVersion = "master"
 )
 
-func NewWebHandler(m *metrics.Metrics, osClient openshift.OSClient, factory ClientFactory) AppHandler {
+var webappParams = [...]string{"OPENSHIFT_OAUTHCLIENT_ID", "OPENSHIFT_HOST", "SSO_ROUTE", "WALKTHROUGH_LOCATIONS"}
+
+
+
+
+func NewWebHandler(m *metrics.Metrics, osClient openshift.OSClientInterface, factory ClientFactory, cruder SdkCruder) AppHandler {
 	return AppHandler{
 		metrics:                      m,
 		osClient:                     osClient,
 		dynamicResourceClientFactory: factory,
+		sdkCruder: 					  cruder,
 	}
 }
 
@@ -43,6 +49,18 @@ func (h *AppHandler) Handle(ctx context.Context, event sdk.Event) error {
 			}
 			return nil
 		}
+
+		if o.Status.Message == "OK" {
+			//finished provision, move to reconcile
+			err := h.reconcile(o)
+			if err != nil {
+				h.SetStatus("Error: "+err.Error(), o)
+				return err
+			}
+			h.SetStatus("OK", o)
+			return nil
+		}
+
 		exts, err := h.ProcessTemplate(o)
 		if err != nil {
 			logrus.Errorf("Error while processing the template: %v", err)
@@ -62,11 +80,7 @@ func (h *AppHandler) Handle(ctx context.Context, event sdk.Event) error {
 			return err
 		}
 		if h.IsAppReady(o) {
-			if err := h.reconcile(o); err != nil {
-				h.SetStatus("Error: " + err.Error(), o)
-			} else {
-				h.SetStatus("OK", o)
-			}
+			h.SetStatus("OK", o)
 		} else {
 			h.SetStatus("", o)
 		}
@@ -84,12 +98,16 @@ func (h *AppHandler) reconcile(cr *v1alpha1.WebApp) error {
 		return err
 	}
 	dcUpdated := false
-	for _, param := range []string{"OPENSHIFT_OAUTHCLIENT_ID", "OPENSHIFT_HOST", "SSO_ROUTE", "WALKTHROUGH_LOCATIONS"} {
+	for _, param := range webappParams {
+		updated := false
 		if val, ok := cr.Spec.Template.Parameters[param]; ok {
-			dcUpdated, dc.Spec.Template.Spec.Containers[0] = updateOrCreateEnvVar(dc.Spec.Template.Spec.Containers[0], param, val)
+			updated, dc.Spec.Template.Spec.Containers[0] = updateOrCreateEnvVar(dc.Spec.Template.Spec.Containers[0], param, val)
 		} else {
 			//key does not exist in CR, ensure it is not present in the DC
-			dcUpdated, dc.Spec.Template.Spec.Containers[0] = deleteEnvVar(dc.Spec.Template.Spec.Containers[0], param)
+			updated, dc.Spec.Template.Spec.Containers[0] = deleteEnvVar(dc.Spec.Template.Spec.Containers[0], param)
+		}
+		if updated && ! dcUpdated {
+			dcUpdated = true
 		}
 	}
 	//update the DC
@@ -133,7 +151,7 @@ func (h *AppHandler) Delete(cr *v1alpha1.WebApp) error {
 func (h *AppHandler) SetStatus(msg string, cr *v1alpha1.WebApp) {
 	cr.Status.Message = msg
 	cr.Status.Version = WebappVersion
-	sdk.Update(cr)
+	h.sdkCruder.Update(cr)
 }
 
 func (h *AppHandler) ProcessTemplate(cr *v1alpha1.WebApp) ([]runtime.RawExtension, error) {
@@ -149,9 +167,7 @@ func (h *AppHandler) ProcessTemplate(cr *v1alpha1.WebApp) ([]runtime.RawExtensio
 	}
 
 	tmpl := res.(*v1.Template)
-	ext, err := h.osClient.TmplHandler.Process(tmpl, params, openshift.TemplateDefaultOpts)
-
-	return ext, err
+	return h.osClient.ProcessTemplate(tmpl, params, openshift.TemplateDefaultOpts)
 }
 
 func (h *AppHandler) GetRuntimeObjs(exts []runtime.RawExtension) ([]runtime.Object, error) {

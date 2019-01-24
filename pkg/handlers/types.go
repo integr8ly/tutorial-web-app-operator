@@ -15,6 +15,17 @@ type Handlers struct {
 	WebAppHandler Handler
 }
 
+
+//go:generate moq -out sdkCruder_moq.go . SdkCruder
+
+type SdkCruder interface {
+	Create(object sdk.Object) error
+	Update(object sdk.Object) error
+	Delete(object sdk.Object, opts ...sdk.DeleteOption) error
+	Get(object sdk.Object, opts ...sdk.GetOption) error
+	List(namespace string, into sdk.Object, opts ...sdk.ListOption) error
+}
+
 type Handler interface {
 	Handle(ctx context.Context, event sdk.Event) error
 	Delete(cr *v1alpha1.WebApp) error
@@ -29,8 +40,9 @@ type ClientFactory func(apiVersion, kind, namespace string) (dynamic.ResourceInt
 
 type AppHandler struct {
 	metrics                      *metrics.Metrics
-	osClient                     openshift.OSClient
+	osClient                     openshift.OSClientInterface
 	dynamicResourceClientFactory ClientFactory
+	sdkCruder 					 SdkCruder
 }
 
 type Metrics struct {
