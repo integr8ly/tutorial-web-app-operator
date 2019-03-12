@@ -32,6 +32,13 @@ rules:
   verbs:
   - "*"
 - apiGroups:
+  - monitoring.coreos.com
+  resources:
+  - prometheusrules
+  - servicemonitors
+  verbs:
+  - '*'
+- apiGroups:
   - template.openshift.io
   resources:
   - processedtemplates
