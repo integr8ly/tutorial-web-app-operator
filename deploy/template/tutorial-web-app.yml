@@ -77,24 +77,6 @@ objects:
             protocol: TCP
     triggers:
       - type: ConfigChange
-- apiVersion: monitoring.coreos.com/v1
-  kind: ServiceMonitor
-  metadata: 
-    labels: 
-      monitoring-key: middleware
-    name: tutorial-webapp-monitoring
-    namespace: webapp
-  selector: 
-    matchLabels: 
-      app: tutorial-web-app
-  spec: 
-    endpoints: 
-      - 
-        path: /metrics
-        port: http
-        scheme: http
-        tlsConfig: 
-          insecureSkipVerify: true
 - apiVersion: v1
   kind: Service
   metadata:
