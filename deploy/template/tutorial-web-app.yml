@@ -68,7 +68,7 @@ objects:
             value: ${SSO_ROUTE}
           - name: WALKTHROUGH_LOCATIONS
             value: ${WALKTHROUGH_LOCATIONS}
-          image: quay.io/integreatly/tutorial-web-app:v2.6.0
+          image: quay.io/integreatly/tutorial-web-app:v2.7.0
           imagePullPolicy: Always
           name: tutorial-web-app
           ports:
