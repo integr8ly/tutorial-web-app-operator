@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	WebappVersion      = "master"
+	WebappVersion      = "v2.7.0"
 	WTLocations        = "WALKTHROUGH_LOCATIONS"
 	WTLocationsDefault = "https://github.com/integr8ly/tutorial-web-app-walkthroughs#v1.5.0"
 )
