@@ -49,4 +49,5 @@ Update operator version files:
 
 Commit changes and open a pull request to master.
 
-When the PR is merged, create a new Github release from master for v<version> e.g. v0.0.10
+When the PR is merged, create a new Github release from master for v<version> e.g. v0.0.10.
+This will trigger a ci build of the tag, and a new image pushed to quay.io with that tag.
