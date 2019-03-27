@@ -47,8 +47,6 @@ Update operator version files:
 * Bump [operator image version](deploy/operator.yaml)
 ```image: quay.io/integreatly/tutorial-web-app-operator:v<version>```
 
-Commit changes and open pull request.
+Commit changes and open a pull request to master.
 
-When the PR is accepted, create a new release tag:
-
-```git tag v<version> && git push upstream v<version>```
+When the PR is merged, create a new Github release from master for v<version> e.g. v0.0.10
