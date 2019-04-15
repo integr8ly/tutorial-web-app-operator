@@ -22,7 +22,7 @@ import (
 const (
 	WebappVersion      = "master"
 	WTLocations        = "WALKTHROUGH_LOCATIONS"
-	WTLocationsDefault = "https://github.com/integr8ly/tutorial-web-app-walkthroughs#v1.6.1"
+	WTLocationsDefault = "https://github.com/integr8ly/tutorial-web-app-walkthroughs#v1.6.2"
 )
 
 var webappParams = [...]string{"OPENSHIFT_OAUTHCLIENT_ID", "OPENSHIFT_HOST", "SSO_ROUTE", WTLocations}
