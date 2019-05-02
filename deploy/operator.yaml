@@ -15,7 +15,7 @@ spec:
       serviceAccountName: tutorial-web-app-operator
       containers:
         - name: tutorial-web-app-operator
-          image: quay.io/integreatly/tutorial-web-app-operator:v0.0.14
+          image: quay.io/integreatly/tutorial-web-app-operator:v0.0.15
           ports:
           - containerPort: 60000
             name: metrics
