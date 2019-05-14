@@ -29,7 +29,7 @@ parameters:
     required: false
   - name: WALKTHROUGH_LOCATIONS
     description: A comma separated list of git repositories or paths to walkthrough directories
-    value: https://github.com/integr8ly/tutorial-web-app-walkthroughs.git#v1.6.3
+    value: https://github.com/integr8ly/tutorial-web-app-walkthroughs.git#v1.6.4
     required: true
 objects:
 - apiVersion: v1
@@ -68,7 +68,7 @@ objects:
             value: ${SSO_ROUTE}
           - name: WALKTHROUGH_LOCATIONS
             value: ${WALKTHROUGH_LOCATIONS}
-          image: quay.io/integreatly/tutorial-web-app:2.10.2
+          image: quay.io/integreatly/tutorial-web-app:2.10.3
           imagePullPolicy: Always
           name: tutorial-web-app
           ports:
