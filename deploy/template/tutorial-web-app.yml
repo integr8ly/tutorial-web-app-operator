@@ -68,6 +68,8 @@ objects:
             value: ${SSO_ROUTE}
           - name: WALKTHROUGH_LOCATIONS
             value: ${WALKTHROUGH_LOCATIONS}
+          - name: INTEGREATLY_VERSION
+            value: ${INTEGREATLY_VERSION}
           image: quay.io/integreatly/tutorial-web-app:2.10.3
           imagePullPolicy: Always
           name: tutorial-web-app

@@ -20,12 +20,14 @@ import (
 )
 
 const (
-	WebappVersion      = "master"
-	WTLocations        = "WALKTHROUGH_LOCATIONS"
-	WTLocationsDefault = "https://github.com/integr8ly/tutorial-web-app-walkthroughs#v1.6.4"
+	WebappVersion             = "master"
+	WTLocations               = "WALKTHROUGH_LOCATIONS"
+	IntegreatlyVersion        = "INTEGREATLY_VERSION"
+	WTLocationsDefault        = "https://github.com/integr8ly/tutorial-web-app-walkthroughs#v1.6.4"
+	IntegreatlyVersionDefault = "not set"
 )
 
-var webappParams = [...]string{"OPENSHIFT_OAUTHCLIENT_ID", "OPENSHIFT_HOST", "SSO_ROUTE", WTLocations}
+var webappParams = [...]string{"OPENSHIFT_OAUTHCLIENT_ID", "OPENSHIFT_HOST", "SSO_ROUTE", IntegreatlyVersion, WTLocations}
 
 func NewWebHandler(m *metrics.Metrics, osClient openshift.OSClientInterface, factory ClientFactory, cruder SdkCruder) AppHandler {
 	return AppHandler{
@@ -105,6 +107,8 @@ func (h *AppHandler) reconcile(cr *v1alpha1.WebApp) error {
 			// if WALKTHROUGH_LOCATIONS is not defined then use the default value
 			if param == WTLocations {
 				updated, dc.Spec.Template.Spec.Containers[0] = updateOrCreateEnvVar(dc.Spec.Template.Spec.Containers[0], param, WTLocationsDefault)
+			} else if param == IntegreatlyVersion {
+				updated, dc.Spec.Template.Spec.Containers[0] = updateOrCreateEnvVar(dc.Spec.Template.Spec.Containers[0], param, IntegreatlyVersionDefault)
 			} else {
 				//key does not exist in CR, ensure it is not present in the DC
 				updated, dc.Spec.Template.Spec.Containers[0] = deleteEnvVar(dc.Spec.Template.Spec.Containers[0], param)
