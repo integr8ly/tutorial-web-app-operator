@@ -31,6 +31,10 @@ parameters:
     description: A comma separated list of git repositories or paths to walkthrough directories
     value: https://github.com/integr8ly/tutorial-web-app-walkthroughs.git#v1.6.4
     required: true
+  - name: DATABASE_LOCATION
+    description: The location of the user walkthroughs database in the filesystem
+    value: /opt/user-walkthroughs
+    required: true
 objects:
   - apiVersion: v1
     kind: DeploymentConfig
@@ -74,6 +78,8 @@ objects:
                   value: ${WALKTHROUGH_LOCATIONS}
                 - name: INTEGREATLY_VERSION
                   value: ${INTEGREATLY_VERSION}
+                - name: DATABASE_LOCATION
+                  value: ${DATABASE_LOCATION}
               image: quay.io/integreatly/tutorial-web-app:2.10.3
               imagePullPolicy: Always
               name: tutorial-web-app
@@ -82,7 +88,7 @@ objects:
                   name: http
                   protocol: TCP
               volumeMounts:
-                - mountPath: /opt/user-walkthroughs
+                - mountPath: ${DATABASE_LOCATION}
                   name: user-walkthroughs
       triggers:
         - type: ConfigChange
