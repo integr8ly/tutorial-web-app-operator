@@ -80,7 +80,7 @@ objects:
                   value: ${INTEGREATLY_VERSION}
                 - name: DATABASE_LOCATION
                   value: ${DATABASE_LOCATION}
-              image: quay.io/integreatly/tutorial-web-app:2.10.4
+              image: quay.io/integreatly/tutorial-web-app:2.10.5
               imagePullPolicy: Always
               name: tutorial-web-app
               ports:
