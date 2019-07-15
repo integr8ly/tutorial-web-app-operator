@@ -48,9 +48,11 @@ objects:
       selector:
         app: tutorial-web-app
       strategy:
-        rollingParams:
-          timeoutSeconds: 3600
-        type: Rolling
+        activeDeadlineSeconds: 21600
+        recreateParams:
+          timeoutSeconds: 600
+        resources: {}
+        type: Recreate
       template:
         metadata:
           labels:
@@ -80,7 +82,7 @@ objects:
                   value: ${INTEGREATLY_VERSION}
                 - name: DATABASE_LOCATION
                   value: ${DATABASE_LOCATION}
-              image: quay.io/integreatly/tutorial-web-app:2.10.5
+              image: quay.io/integreatly/tutorial-web-app:close-connections
               imagePullPolicy: Always
               name: tutorial-web-app
               ports:
