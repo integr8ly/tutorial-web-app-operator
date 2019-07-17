@@ -48,9 +48,11 @@ objects:
       selector:
         app: tutorial-web-app
       strategy:
-        rollingParams:
-          timeoutSeconds: 3600
-        type: Rolling
+        activeDeadlineSeconds: 21600
+        recreateParams:
+          timeoutSeconds: 600
+        resources: {}
+        type: Recreate
       template:
         metadata:
           labels:
