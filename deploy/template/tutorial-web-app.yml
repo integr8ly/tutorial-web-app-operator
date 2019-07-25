@@ -80,9 +80,11 @@ objects:
                   value: ${WALKTHROUGH_LOCATIONS}
                 - name: INTEGREATLY_VERSION
                   value: ${INTEGREATLY_VERSION}
+                - name: CLUSTER_TYPE
+                  value: ${CLUSTER_TYPE}
                 - name: DATABASE_LOCATION
                   value: ${DATABASE_LOCATION}
-              image: quay.io/integreatly/tutorial-web-app:2.10.5
+              image: quay.io/integreatly/tutorial-web-app:2.12.2
               imagePullPolicy: Always
               name: tutorial-web-app
               ports:
