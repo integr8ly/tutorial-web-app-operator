@@ -84,7 +84,7 @@ objects:
                   value: ${CLUSTER_TYPE}
                 - name: DATABASE_LOCATION
                   value: ${DATABASE_LOCATION}
-              image: quay.io/integreatly/tutorial-web-app:2.12.2
+              image: quay.io/integreatly/tutorial-web-app:2.13.0
               imagePullPolicy: Always
               name: tutorial-web-app
               ports:
