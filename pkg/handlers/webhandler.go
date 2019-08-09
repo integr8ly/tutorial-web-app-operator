@@ -29,7 +29,7 @@ const (
 	ClusterTypeDefault        = "not set"
 )
 
-var webappParams = [...]string{"OPENSHIFT_OAUTHCLIENT_ID", "OPENSHIFT_HOST", "SSO_ROUTE", IntegreatlyVersion, WTLocations, ClusterType}
+var webappParams = [...]string{"OPENSHIFT_OAUTHCLIENT_ID", "OPENSHIFT_HOST", "OPENSHIFT_OAUTH_HOST", "SSO_ROUTE", IntegreatlyVersion, WTLocations, ClusterType}
 
 func NewWebHandler(m *metrics.Metrics, osClient openshift.OSClientInterface, factory ClientFactory, cruder SdkCruder) AppHandler {
 	return AppHandler{
