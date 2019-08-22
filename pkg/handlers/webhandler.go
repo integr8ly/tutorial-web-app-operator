@@ -24,12 +24,16 @@ const (
 	WTLocations               = "WALKTHROUGH_LOCATIONS"
 	IntegreatlyVersion        = "INTEGREATLY_VERSION"
 	ClusterType               = "CLUSTER_TYPE"
-	WTLocationsDefault        = "https://github.com/integr8ly/tutorial-web-app-walkthroughs#v1.6.5"
+	OpenShiftVersion          = "OPENSHIFT_VERSION"
+	OpenShiftAPIHost          = "OPENSHIFT_API"
+	WTLocationsDefault        = "https://github.com/integr8ly/tutorial-web-app-walkthroughs#v1.7.2"
 	IntegreatlyVersionDefault = "not set"
 	ClusterTypeDefault        = "not set"
+	OpenShiftVersionDefault   = "3"
+	OpenShiftAPIHostDefault   = "openshift.default.svc"
 )
 
-var webappParams = [...]string{"OPENSHIFT_OAUTHCLIENT_ID", "OPENSHIFT_HOST", "OPENSHIFT_OAUTH_HOST", "SSO_ROUTE", IntegreatlyVersion, WTLocations, ClusterType}
+var webappParams = [...]string{"OPENSHIFT_OAUTHCLIENT_ID", "OPENSHIFT_HOST", "OPENSHIFT_OAUTH_HOST", "SSO_ROUTE", OpenShiftAPIHost, OpenShiftVersion, IntegreatlyVersion, WTLocations, ClusterType}
 
 func NewWebHandler(m *metrics.Metrics, osClient openshift.OSClientInterface, factory ClientFactory, cruder SdkCruder) AppHandler {
 	return AppHandler{
@@ -113,6 +117,10 @@ func (h *AppHandler) reconcile(cr *v1alpha1.WebApp) error {
 				updated, dc.Spec.Template.Spec.Containers[0] = updateOrCreateEnvVar(dc.Spec.Template.Spec.Containers[0], param, IntegreatlyVersionDefault)
 			} else if param == ClusterType {
 				updated, dc.Spec.Template.Spec.Containers[0] = updateOrCreateEnvVar(dc.Spec.Template.Spec.Containers[0], param, ClusterTypeDefault)
+			} else if param == OpenShiftVersion {
+				updated, dc.Spec.Template.Spec.Containers[0] = updateOrCreateEnvVar(dc.Spec.Template.Spec.Containers[0], param, OpenShiftVersionDefault)
+			} else if param == OpenShiftAPIHost {
+				updated, dc.Spec.Template.Spec.Containers[0] = updateOrCreateEnvVar(dc.Spec.Template.Spec.Containers[0], param, OpenShiftAPIHostDefault)
 			} else {
 				//key does not exist in CR, ensure it is not present in the DC
 				updated, dc.Spec.Template.Spec.Containers[0] = deleteEnvVar(dc.Spec.Template.Spec.Containers[0], param)

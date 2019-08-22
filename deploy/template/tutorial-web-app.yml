@@ -3,6 +3,16 @@ kind: Template
 metadata:
   name: tutorial-web-app
 parameters:
+  - name: OPENSHIFT_VERSION
+    description: The version of OpenShift that it will run in
+    displayName: OpenShift Version
+    value: '3'
+    required: true
+  - name: OPENSHIFT_API
+    description: The OpenShift clusters API URL (Required in OpenShift 4)
+    displayName: OpenShift API Host
+    value: openshift.default.svc
+    required: false
   - name: OPENSHIFT_OAUTHCLIENT_ID
     description: The OAuthClient id in OpenShift to use for auth
     displayName: OAuthClient ID
@@ -33,7 +43,7 @@ parameters:
     required: false
   - name: WALKTHROUGH_LOCATIONS
     description: A comma separated list of git repositories or paths to walkthrough directories
-    value: https://github.com/integr8ly/tutorial-web-app-walkthroughs.git#v1.6.5
+    value: https://github.com/integr8ly/tutorial-web-app-walkthroughs.git#v1.7.2
     required: true
   - name: DATABASE_LOCATION
     description: The location of the user walkthroughs database in the filesystem
@@ -76,6 +86,10 @@ objects:
                   value: ${OPENSHIFT_OAUTHCLIENT_ID}
                 - name: OPENSHIFT_HOST
                   value: ${OPENSHIFT_HOST}
+                - name: OPENSHIFT_VERSION
+                  value: ${OPENSHIFT_VERSION}
+                - name: OPENSHIFT_API
+                  value: ${OPENSHIFT_API}
                 - name: OPENSHIFT_OAUTH_HOST
                   value: ${OPENSHIFT_OAUTH_HOST}
                 - name: NODE_ENV
@@ -90,7 +104,7 @@ objects:
                   value: ${CLUSTER_TYPE}
                 - name: DATABASE_LOCATION
                   value: ${DATABASE_LOCATION}
-              image: quay.io/integreatly/tutorial-web-app:2.16.0
+              image: quay.io/integreatly/tutorial-web-app:2.18.0
               imagePullPolicy: Always
               name: tutorial-web-app
               ports:
