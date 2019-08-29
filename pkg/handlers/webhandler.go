@@ -24,7 +24,7 @@ const (
 	WTLocations               = "WALKTHROUGH_LOCATIONS"
 	IntegreatlyVersion        = "INTEGREATLY_VERSION"
 	ClusterType               = "CLUSTER_TYPE"
-	WTLocationsDefault        = "https://github.com/integr8ly/tutorial-web-app-walkthroughs#v1.6.6"
+	WTLocationsDefault        = "https://github.com/integr8ly/tutorial-web-app-walkthroughs#v1.6.8"
 	IntegreatlyVersionDefault = "not set"
 	ClusterTypeDefault        = "not set"
 )
