@@ -33,7 +33,7 @@ parameters:
     required: false
   - name: WALKTHROUGH_LOCATIONS
     description: A comma separated list of git repositories or paths to walkthrough directories
-    value: https://github.com/integr8ly/tutorial-web-app-walkthroughs.git#v1.6.5
+    value: https://github.com/integr8ly/tutorial-web-app-walkthroughs.git#v1.6.7
     required: true
   - name: DATABASE_LOCATION
     description: The location of the user walkthroughs database in the filesystem
@@ -90,7 +90,7 @@ objects:
                   value: ${CLUSTER_TYPE}
                 - name: DATABASE_LOCATION
                   value: ${DATABASE_LOCATION}
-              image: quay.io/integreatly/tutorial-web-app:2.18.3
+              image: quay.io/integreatly/tutorial-web-app:2.18.4
               imagePullPolicy: Always
               name: tutorial-web-app
               ports:
