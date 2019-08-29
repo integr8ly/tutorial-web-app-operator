@@ -33,7 +33,7 @@ parameters:
     required: false
   - name: WALKTHROUGH_LOCATIONS
     description: A comma separated list of git repositories or paths to walkthrough directories
-    value: https://github.com/integr8ly/tutorial-web-app-walkthroughs.git#v1.6.7
+    value: https://github.com/integr8ly/tutorial-web-app-walkthroughs.git#v1.6.8
     required: true
   - name: DATABASE_LOCATION
     description: The location of the user walkthroughs database in the filesystem
