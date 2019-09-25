@@ -49,6 +49,9 @@ parameters:
     description: The location of the user walkthroughs database in the filesystem
     value: /opt/user-walkthroughs
     required: true
+  - name: INSTALLED_SERVICES
+    description: Object which contains information on the services installed by Integreatly. Only used for OpenShift V4
+    required: false
 objects:
   - apiVersion: v1
     kind: DeploymentConfig
@@ -104,6 +107,8 @@ objects:
                   value: ${CLUSTER_TYPE}
                 - name: DATABASE_LOCATION
                   value: ${DATABASE_LOCATION}
+                - name: INSTALLED_SERVICES
+                  value: ${INSTALLED_SERVICES}
               image: quay.io/integreatly/tutorial-web-app:2.18.7
               imagePullPolicy: Always
               name: tutorial-web-app
