@@ -36,6 +36,13 @@ make image/build REG=custom-registry.io ORG=myusername IMAGE=image-name TAG=dev
 make test/unit
 ```
 
+## Updating Web App Image Version
+Update web app image version in the following files:
+* Update [WebAppImage](pkg/handlers/webhandler.go) `WebAppImage = "quay.io/integreatly/tutorial-web-app:<version>"`
+  * Image version that the deployment config gets reconciled to (**Must be updated as would override the version used by the template**)
+* Update [tutorial-web-app.yml template](deploy/template/tutorial-web-app.yml) `image: quay.io/integreatly/tutorial-web-app:<version>`
+  * Image version that gets deployed on initial processing of the template file
+
 ## Release
 
 Update operator version files:

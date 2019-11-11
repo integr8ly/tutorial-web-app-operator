@@ -3,13 +3,14 @@ package handlers
 import (
 	"context"
 	"errors"
+	"testing"
+
 	"github.com/integr8ly/tutorial-web-app-operator/pkg/apis/integreatly/openshift"
 	"github.com/integr8ly/tutorial-web-app-operator/pkg/apis/integreatly/v1alpha1"
-	"github.com/openshift/api/apps/v1"
+	v1 "github.com/openshift/api/apps/v1"
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	v12 "k8s.io/api/core/v1"
 	"k8s.io/client-go/dynamic"
-	"testing"
 )
 
 func MockGetResourcesClient(_, _, _ string) (dynamic.ResourceInterface, string, error) {
@@ -123,6 +124,44 @@ func TestReconcile(t *testing.T) {
 			wh := NewWebHandler(nil, osClient, MockGetResourcesClient, tc.SDKCruder())
 			wh.Handle(context.TODO(), tc.Event)
 			tc.Verify(tc.Event.Object.(*v1alpha1.WebApp), t)
+		})
+	}
+}
+
+func TestMigrateImage(t *testing.T) {
+	cases := []struct {
+		Name      string
+		Container v12.Container
+		Verify    func(bool, v12.Container)
+	}{
+		{
+			Name: "Container Image not updated if image is the same",
+			Container: v12.Container{
+				Image: WebAppImage,
+			},
+			Verify: func(updated bool, container v12.Container) {
+				if updated != false {
+					t.Fatalf("Expected image to not be updated but was updated...")
+				}
+			},
+		},
+		{
+			Name: "Container Image is updated if image is not the same",
+			Container: v12.Container{
+				Image: "someDifferentImage",
+			},
+			Verify: func(updated bool, container v12.Container) {
+				if updated != true && container.Image != WebAppImage {
+					t.Fatalf("Expected image to be updated but was not...")
+				}
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.Name, func(t *testing.T) {
+			updated, container := migrateImage(tc.Container)
+			tc.Verify(updated, container)
 		})
 	}
 }

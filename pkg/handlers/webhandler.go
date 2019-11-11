@@ -10,7 +10,7 @@ import (
 
 	"github.com/integr8ly/tutorial-web-app-operator/pkg/apis/integreatly/openshift"
 	"github.com/integr8ly/tutorial-web-app-operator/pkg/metrics"
-	"github.com/openshift/api/template/v1"
+	v1 "github.com/openshift/api/template/v1"
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"github.com/operator-framework/operator-sdk/pkg/util/k8sutil"
 	"github.com/sirupsen/logrus"
@@ -31,6 +31,7 @@ const (
 	ClusterTypeDefault        = "not set"
 	OpenShiftVersionDefault   = "3"
 	OpenShiftAPIHostDefault   = "openshift.default.svc"
+	WebAppImage               = "quay.io/integreatly/tutorial-web-app:2.19.1"
 )
 
 var webappParams = [...]string{"OPENSHIFT_OAUTHCLIENT_ID", "OPENSHIFT_HOST", "OPENSHIFT_OAUTH_HOST", "SSO_ROUTE", OpenShiftAPIHost, OpenShiftVersion, IntegreatlyVersion, WTLocations, ClusterType}
@@ -105,6 +106,9 @@ func (h *AppHandler) reconcile(cr *v1alpha1.WebApp) error {
 		return err
 	}
 	dcUpdated := false
+
+	dcUpdated, dc.Spec.Template.Spec.Containers[0] = migrateImage(dc.Spec.Template.Spec.Containers[0])
+
 	for _, param := range webappParams {
 		updated := false
 		if val, ok := cr.Spec.Template.Parameters[param]; ok {
@@ -132,9 +136,20 @@ func (h *AppHandler) reconcile(cr *v1alpha1.WebApp) error {
 	}
 	//update the DC
 	if dcUpdated {
+		logrus.Info("Updating DC")
 		return h.osClient.UpdateDC(cr.Namespace, &dc)
 	}
 	return nil
+}
+
+func migrateImage(container corev1.Container) (bool, corev1.Container) {
+	if container.Image == WebAppImage {
+		return false, container
+	}
+
+	logrus.Infof("Migrating image from %v to %v", container.Image, WebAppImage)
+	container.Image = WebAppImage
+	return true, container
 }
 
 func deleteEnvVar(container corev1.Container, envName string) (bool, corev1.Container) {
