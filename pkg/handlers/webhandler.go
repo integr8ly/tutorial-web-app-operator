@@ -31,7 +31,7 @@ const (
 	ClusterTypeDefault        = "not set"
 	OpenShiftVersionDefault   = "3"
 	OpenShiftAPIHostDefault   = "openshift.default.svc"
-	WebAppImage               = "quay.io/integreatly/tutorial-web-app:2.19.1"
+	WebAppImage               = "quay.io/integreatly/tutorial-web-app:2.19.2"
 )
 
 var webappParams = [...]string{"OPENSHIFT_OAUTHCLIENT_ID", "OPENSHIFT_HOST", "OPENSHIFT_OAUTH_HOST", "SSO_ROUTE", OpenShiftAPIHost, OpenShiftVersion, IntegreatlyVersion, WTLocations, ClusterType}
