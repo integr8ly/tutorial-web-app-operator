@@ -52,6 +52,10 @@ parameters:
   - name: INSTALLED_SERVICES
     description: Object which contains information on the services installed by Integreatly. Only used for OpenShift V4
     required: false
+  - name: IMAGE
+    description: Image of the webapp container to deploy
+    value: quay.io/integreatly/tutorial-web-app:2.19.4
+    required: true
 objects:
   - apiVersion: v1
     kind: DeploymentConfig
@@ -109,7 +113,7 @@ objects:
                   value: ${DATABASE_LOCATION}
                 - name: INSTALLED_SERVICES
                   value: ${INSTALLED_SERVICES}
-              image: quay.io/integreatly/tutorial-web-app:2.19.2
+              image: ${IMAGE}
               imagePullPolicy: Always
               name: tutorial-web-app
               ports:
