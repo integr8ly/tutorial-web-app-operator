@@ -196,7 +196,7 @@ func (h *AppHandler) ProcessTemplate(cr *v1alpha1.WebApp) ([]runtime.RawExtensio
 		return nil, err
 	}
 
-	params := make(map[string]string)
+	params := map[string]string{"IMAGE": WebAppImage}
 	for k, v := range cr.Spec.Template.Parameters {
 		params[k] = v
 	}
