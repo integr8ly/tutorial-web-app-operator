@@ -26,7 +26,7 @@ const (
 	ClusterType               = "CLUSTER_TYPE"
 	OpenShiftVersion          = "OPENSHIFT_VERSION"
 	OpenShiftAPIHost          = "OPENSHIFT_API"
-	WTLocationsDefault        = "https://github.com/integr8ly/tutorial-web-app-walkthroughs#v1.10.0"
+	WTLocationsDefault        = "https://github.com/integr8ly/tutorial-web-app-walkthroughs#v1.10.1"
 	IntegreatlyVersionDefault = "not set"
 	ClusterTypeDefault        = "not set"
 	OpenShiftVersionDefault   = "3"
