@@ -109,7 +109,7 @@ objects:
                   value: ${DATABASE_LOCATION}
                 - name: INSTALLED_SERVICES
                   value: ${INSTALLED_SERVICES}
-              image: quay.io/integreatly/tutorial-web-app:2.21.0
+              image: quay.io/integreatly/tutorial-web-app:2.21.1
               imagePullPolicy: Always
               name: tutorial-web-app
               ports:
