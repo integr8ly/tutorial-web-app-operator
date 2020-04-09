@@ -26,6 +26,7 @@ const (
 	ClusterType               = "CLUSTER_TYPE"
 	OpenShiftVersion          = "OPENSHIFT_VERSION"
 	OpenShiftAPIHost          = "OPENSHIFT_API"
+	InstalledServices         = "INSTALLED_SERVICES"
 	WTLocationsDefault        = "https://github.com/integr8ly/tutorial-web-app-walkthroughs#v1.10.1"
 	IntegreatlyVersionDefault = "not set"
 	ClusterTypeDefault        = "not set"
@@ -34,7 +35,7 @@ const (
 	WebAppImage               = "quay.io/integreatly/tutorial-web-app:2.22.3"
 )
 
-var webappParams = [...]string{"OPENSHIFT_OAUTHCLIENT_ID", "OPENSHIFT_HOST", "OPENSHIFT_OAUTH_HOST", "SSO_ROUTE", OpenShiftAPIHost, OpenShiftVersion, IntegreatlyVersion, WTLocations, ClusterType}
+var webappParams = [...]string{"OPENSHIFT_OAUTHCLIENT_ID", "OPENSHIFT_HOST", "OPENSHIFT_OAUTH_HOST", "SSO_ROUTE", OpenShiftAPIHost, OpenShiftVersion, IntegreatlyVersion, WTLocations, ClusterType, InstalledServices}
 
 func NewWebHandler(m *metrics.Metrics, osClient openshift.OSClientInterface, factory ClientFactory, cruder SdkCruder) AppHandler {
 	return AppHandler{
