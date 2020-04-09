@@ -138,7 +138,7 @@ objects:
     metadata:
       labels:
         app: tutorial-web-app
-      name: tutorial-web-app
+      name: solution-explorer
     spec:
       tls:
         termination: edge
