@@ -230,7 +230,7 @@ func (h *AppHandler) GetRuntimeObjs(exts []runtime.RawExtension) ([]runtime.Obje
 }
 
 func (h *AppHandler) CreateRoute(cr *v1alpha1.WebApp) *routev1.Route {
-	return &routev1.Route{
+	route := &routev1.Route{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Route",
 			APIVersion: "route.openshift.io/v1",
@@ -241,7 +241,6 @@ func (h *AppHandler) CreateRoute(cr *v1alpha1.WebApp) *routev1.Route {
 			Labels:    cr.GetLabels(),
 		},
 		Spec: routev1.RouteSpec{
-			Host: fmt.Sprintf("%s.%s", routeName, cr.Spec.RoutingSubdomain),
 			TLS: &routev1.TLSConfig{
 				Termination: routev1.TLSTerminationEdge,
 			},
@@ -251,6 +250,11 @@ func (h *AppHandler) CreateRoute(cr *v1alpha1.WebApp) *routev1.Route {
 			},
 		},
 	}
+	subdomain := cr.Spec.Template.Parameters["ROUTING_SUBDOMAIN"]
+	if subdomain != "" {
+		route.Spec.Host = fmt.Sprintf("%s.%s", routeName, subdomain)
+	}
+	return route
 }
 
 func (h *AppHandler) ProvisionObjects(objects []runtime.Object, cr *v1alpha1.WebApp) error {
