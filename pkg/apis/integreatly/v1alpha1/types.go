@@ -22,8 +22,9 @@ type WebApp struct {
 }
 
 type WebAppSpec struct {
-	AppLabel string         `json:"app_label"`
-	Template WebAppTemplate `json:"template"`
+	AppLabel         string         `json:"app_label"`
+	Template         WebAppTemplate `json:"template"`
+	RoutingSubdomain string         `json:"routingSubdomain"`
 }
 
 type WebAppStatus struct {
