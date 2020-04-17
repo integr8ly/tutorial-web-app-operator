@@ -3,6 +3,8 @@ package handlers
 import (
 	"context"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"github.com/integr8ly/tutorial-web-app-operator/pkg/apis/integreatly/v1alpha1"
 
 	"errors"
@@ -10,6 +12,7 @@ import (
 
 	"github.com/integr8ly/tutorial-web-app-operator/pkg/apis/integreatly/openshift"
 	"github.com/integr8ly/tutorial-web-app-operator/pkg/metrics"
+	routev1 "github.com/openshift/api/route/v1"
 	v1 "github.com/openshift/api/template/v1"
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"github.com/operator-framework/operator-sdk/pkg/util/k8sutil"
@@ -33,6 +36,8 @@ const (
 	OpenShiftVersionDefault   = "3"
 	OpenShiftAPIHostDefault   = "openshift.default.svc"
 	WebAppImage               = "quay.io/integreatly/tutorial-web-app:2.22.3"
+	serviceName               = "tutorial-web-app"
+	routeName                 = "solution-explorer"
 )
 
 var webappParams = [...]string{"OPENSHIFT_OAUTHCLIENT_ID", "OPENSHIFT_HOST", "OPENSHIFT_OAUTH_HOST", "SSO_ROUTE", OpenShiftAPIHost, OpenShiftVersion, IntegreatlyVersion, WTLocations, ClusterType, InstalledServices}
@@ -82,6 +87,11 @@ func (h *AppHandler) Handle(ctx context.Context, event sdk.Event) error {
 			h.SetStatus(err.Error(), o)
 			return err
 		}
+
+		// append route onto runtime objs list
+		route := h.CreateRoute(o)
+		runtimeObjs = append(runtimeObjs, route)
+
 		err = h.ProvisionObjects(runtimeObjs, o)
 		if err != nil {
 			logrus.Errorf("Error provisioning the runtime objects: %v", err)
@@ -217,6 +227,34 @@ func (h *AppHandler) GetRuntimeObjs(exts []runtime.RawExtension) ([]runtime.Obje
 	}
 
 	return objects, nil
+}
+
+func (h *AppHandler) CreateRoute(cr *v1alpha1.WebApp) *routev1.Route {
+	route := &routev1.Route{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Route",
+			APIVersion: "route.openshift.io/v1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      routeName,
+			Namespace: cr.Namespace,
+			Labels:    cr.GetLabels(),
+		},
+		Spec: routev1.RouteSpec{
+			TLS: &routev1.TLSConfig{
+				Termination: routev1.TLSTerminationEdge,
+			},
+			To: routev1.RouteTargetReference{
+				Kind: "Service",
+				Name: serviceName,
+			},
+		},
+	}
+	subdomain := cr.Spec.Template.Parameters["ROUTING_SUBDOMAIN"]
+	if subdomain != "" {
+		route.Spec.Host = fmt.Sprintf("%s.%s", routeName, subdomain)
+	}
+	return route
 }
 
 func (h *AppHandler) ProvisionObjects(objects []runtime.Object, cr *v1alpha1.WebApp) error {
