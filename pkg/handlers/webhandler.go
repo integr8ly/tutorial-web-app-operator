@@ -37,7 +37,7 @@ const (
 	OpenShiftAPIHostDefault   = "openshift.default.svc"
 	WebAppImage               = "quay.io/integreatly/tutorial-web-app:2.22.3"
 	serviceName               = "tutorial-web-app"
-	routeName                 = "solution-explorer"
+	routeName                 = "tutorial-web-app"
 )
 
 var webappParams = [...]string{"OPENSHIFT_OAUTHCLIENT_ID", "OPENSHIFT_HOST", "OPENSHIFT_OAUTH_HOST", "SSO_ROUTE", OpenShiftAPIHost, OpenShiftVersion, IntegreatlyVersion, WTLocations, ClusterType, InstalledServices}
@@ -251,8 +251,12 @@ func (h *AppHandler) CreateRoute(cr *v1alpha1.WebApp) *routev1.Route {
 		},
 	}
 	subdomain := cr.Spec.Template.Parameters["ROUTING_SUBDOMAIN"]
+
+	// Only set the host when the routing subdomain is set (RHMI 2.x). In 1.x we want to
+	// make sure to not change the existing route hosts because the cluster CORS settings
+	// depend on it
 	if subdomain != "" {
-		route.Spec.Host = fmt.Sprintf("%s.%s", routeName, subdomain)
+		route.Spec.Host = fmt.Sprintf("solution-explorer.%s", subdomain)
 	}
 	return route
 }
