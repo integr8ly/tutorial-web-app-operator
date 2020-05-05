@@ -52,6 +52,9 @@ parameters:
   - name: INSTALLED_SERVICES
     description: Object which contains information on the services installed by Integreatly. Only used for OpenShift V4
     required: false
+  - name: INSTALLATION_TYPE
+    description: Type of cluster
+    required: false
 objects:
   - apiVersion: v1
     kind: DeploymentConfig
@@ -109,6 +112,8 @@ objects:
                   value: ${DATABASE_LOCATION}
                 - name: INSTALLED_SERVICES
                   value: ${INSTALLED_SERVICES}
+                - name: INSTALLATION_TYPE
+                  value: ${INSTALLATION_TYPE}
               image: quay.io/integreatly/tutorial-web-app:2.22.6
               imagePullPolicy: Always
               name: tutorial-web-app
