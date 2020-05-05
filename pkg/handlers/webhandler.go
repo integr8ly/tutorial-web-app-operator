@@ -31,7 +31,6 @@ const (
 	OpenShiftAPIHost          = "OPENSHIFT_API"
 	InstalledServices         = "INSTALLED_SERVICES"
 	InstallationType          = "INSTALLATION_TYPE"
-	RoutingSubdomain          = "ROUTING_SUBDOMAIN"
 	WTLocationsDefault        = "https://github.com/integr8ly/tutorial-web-app-walkthroughs#v1.12.1"
 	IntegreatlyVersionDefault = "not set"
 	ClusterTypeDefault        = "not set"
@@ -252,7 +251,7 @@ func (h *AppHandler) CreateRoute(cr *v1alpha1.WebApp) *routev1.Route {
 			},
 		},
 	}
-	subdomain := cr.Spec.Template.Parameters[RoutingSubdomain]
+	subdomain := cr.Spec.Template.Parameters["ROUTING_SUBDOMAIN"]
 
 	// Only set the host when the routing subdomain is set (RHMI 2.x). In 1.x we want to
 	// make sure to not change the existing route hosts because the cluster CORS settings
