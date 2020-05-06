@@ -173,6 +173,7 @@ func deleteEnvVar(container corev1.Container, envName string) (bool, corev1.Cont
 	}
 	return false, container
 }
+
 func updateOrCreateEnvVar(container corev1.Container, envName, envVal string) (bool, corev1.Container) {
 	for envIndex, envVar := range container.Env {
 		if envVar.Name == envName {
@@ -257,7 +258,9 @@ func (h *AppHandler) CreateRoute(cr *v1alpha1.WebApp) *routev1.Route {
 	// make sure to not change the existing route hosts because the cluster CORS settings
 	// depend on it
 	if subdomain != "" {
-		route.Spec.Host = fmt.Sprintf("solution-explorer.%s", subdomain)
+		routeName := "solution-explorer"
+		route.Name = routeName
+		route.Spec.Host = fmt.Sprintf("%s.%s", routeName, subdomain)
 	}
 	return route
 }
