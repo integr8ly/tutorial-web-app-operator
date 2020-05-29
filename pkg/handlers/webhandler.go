@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"strings"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -23,7 +24,6 @@ import (
 )
 
 const (
-	WebappVersion             = "master"
 	WTLocations               = "WALKTHROUGH_LOCATIONS"
 	IntegreatlyVersion        = "INTEGREATLY_VERSION"
 	ClusterType               = "CLUSTER_TYPE"
@@ -198,7 +198,8 @@ func (h *AppHandler) Delete(cr *v1alpha1.WebApp) error {
 
 func (h *AppHandler) SetStatus(msg string, cr *v1alpha1.WebApp) {
 	cr.Status.Message = msg
-	cr.Status.Version = WebappVersion
+	imgParts := strings.Split(WebAppImage, ":")
+	cr.Status.Version = imgParts[len(imgParts)-1]
 	h.sdkCruder.Update(cr)
 }
 
