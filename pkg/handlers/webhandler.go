@@ -36,7 +36,7 @@ const (
 	ClusterTypeDefault        = "not set"
 	OpenShiftVersionDefault   = "3"
 	OpenShiftAPIHostDefault   = "openshift.default.svc"
-	WebAppImage               = "quay.io/integreatly/tutorial-web-app:2.26.1"
+	WebAppImage               = "quay.io/integreatly/tutorial-web-app:2.26.2"
 	serviceName               = "tutorial-web-app"
 	routeName                 = "tutorial-web-app"
 	upgradeData               = "UPGRADE_DATA"
