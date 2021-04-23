@@ -35,21 +35,21 @@ type Template struct {
 }
 
 type TemplateOpt struct {
-	ApiKind     string
-	ApiVersion  string
-	ApiPath     string
-	ApiGroup    string
-	ApiMimetype string
-	ApiResource string
+	APIKind     string
+	APIVersion  string
+	APIPath     string
+	APIGroup    string
+	APIMimetype string
+	APIResource string
 }
 
 var (
 	TemplateDefaultOpts = TemplateOpt{
-		ApiVersion:  "v1",
-		ApiMimetype: "application/json",
-		ApiPath:     "/apis",
-		ApiGroup:    "template.openshift.io",
-		ApiResource: "processedtemplates",
+		APIVersion:  "v1",
+		APIMimetype: "application/json",
+		APIPath:     "/apis",
+		APIGroup:    "template.openshift.io",
+		APIResource: "processedtemplates",
 	}
 )
 

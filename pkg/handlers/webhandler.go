@@ -8,7 +8,6 @@ import (
 
 	"github.com/integr8ly/tutorial-web-app-operator/pkg/apis/integreatly/v1alpha1"
 
-	"errors"
 	"fmt"
 
 	"github.com/integr8ly/tutorial-web-app-operator/pkg/apis/integreatly/openshift"
@@ -275,7 +274,7 @@ func (h *AppHandler) ProvisionObjects(objects []runtime.Object, cr *v1alpha1.Web
 
 		resourceClient, _, err := h.dynamicResourceClientFactory(apiVersion, kind, cr.Namespace)
 		if err != nil {
-			return errors.New(fmt.Sprintf("failed to get resource client: %v", err))
+			return fmt.Errorf("failed to get resource client: %v", err)
 		}
 
 		unstructObj, err := k8sutil.UnstructuredFromRuntimeObject(o)

@@ -4,19 +4,11 @@
 package openshift
 
 import (
-	appsv1 "github.com/openshift/api/apps/v1"
-	tmplv1 "github.com/openshift/api/template/v1"
+	v14 "github.com/openshift/api/apps/v1"
+	v1template "github.com/openshift/api/template/v1"
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sync"
-)
-
-var (
-	lockOSClientInterfaceMockDelete          sync.RWMutex
-	lockOSClientInterfaceMockGetDC           sync.RWMutex
-	lockOSClientInterfaceMockGetPod          sync.RWMutex
-	lockOSClientInterfaceMockProcessTemplate sync.RWMutex
-	lockOSClientInterfaceMockUpdateDC        sync.RWMutex
 )
 
 // Ensure, that OSClientInterfaceMock does implement OSClientInterface.
@@ -25,46 +17,46 @@ var _ OSClientInterface = &OSClientInterfaceMock{}
 
 // OSClientInterfaceMock is a mock implementation of OSClientInterface.
 //
-//     func TestSomethingThatUsesOSClientInterface(t *testing.T) {
+// 	func TestSomethingThatUsesOSClientInterface(t *testing.T) {
 //
-//         // make and configure a mocked OSClientInterface
-//         mockedOSClientInterface := &OSClientInterfaceMock{
-//             DeleteFunc: func(ns string, label string) error {
-// 	               panic("mock out the Delete method")
-//             },
-//             GetDCFunc: func(ns string, dcName string) (v1.DeploymentConfig, error) {
-// 	               panic("mock out the GetDC method")
-//             },
-//             GetPodFunc: func(ns string, dc string) (v1.Pod, error) {
-// 	               panic("mock out the GetPod method")
-//             },
-//             ProcessTemplateFunc: func(in1 *v1.Template, in2 map[string]string, in3 TemplateOpt) ([]runtime.RawExtension, error) {
-// 	               panic("mock out the ProcessTemplate method")
-//             },
-//             UpdateDCFunc: func(ns string, dc *v1.DeploymentConfig) error {
-// 	               panic("mock out the UpdateDC method")
-//             },
-//         }
+// 		// make and configure a mocked OSClientInterface
+// 		mockedOSClientInterface := &OSClientInterfaceMock{
+// 			DeleteFunc: func(ns string, label string) error {
+// 				panic("mock out the Delete method")
+// 			},
+// 			GetDCFunc: func(ns string, dcName string) (v14.DeploymentConfig, error) {
+// 				panic("mock out the GetDC method")
+// 			},
+// 			GetPodFunc: func(ns string, dc string) (v1.Pod, error) {
+// 				panic("mock out the GetPod method")
+// 			},
+// 			ProcessTemplateFunc: func(template *v1template.Template, stringToString map[string]string, templateOpt TemplateOpt) ([]runtime.RawExtension, error) {
+// 				panic("mock out the ProcessTemplate method")
+// 			},
+// 			UpdateDCFunc: func(ns string, dc *v14.DeploymentConfig) error {
+// 				panic("mock out the UpdateDC method")
+// 			},
+// 		}
 //
-//         // use mockedOSClientInterface in code that requires OSClientInterface
-//         // and then make assertions.
+// 		// use mockedOSClientInterface in code that requires OSClientInterface
+// 		// and then make assertions.
 //
-//     }
+// 	}
 type OSClientInterfaceMock struct {
 	// DeleteFunc mocks the Delete method.
 	DeleteFunc func(ns string, label string) error
 
 	// GetDCFunc mocks the GetDC method.
-	GetDCFunc func(ns string, dcName string) (appsv1.DeploymentConfig, error)
+	GetDCFunc func(ns string, dcName string) (v14.DeploymentConfig, error)
 
 	// GetPodFunc mocks the GetPod method.
 	GetPodFunc func(ns string, dc string) (v1.Pod, error)
 
 	// ProcessTemplateFunc mocks the ProcessTemplate method.
-	ProcessTemplateFunc func(in1 *tmplv1.Template, in2 map[string]string, in3 TemplateOpt) ([]runtime.RawExtension, error)
+	ProcessTemplateFunc func(template *v1template.Template, stringToString map[string]string, templateOpt TemplateOpt) ([]runtime.RawExtension, error)
 
 	// UpdateDCFunc mocks the UpdateDC method.
-	UpdateDCFunc func(ns string, dc *appsv1.DeploymentConfig) error
+	UpdateDCFunc func(ns string, dc *v14.DeploymentConfig) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -91,21 +83,26 @@ type OSClientInterfaceMock struct {
 		}
 		// ProcessTemplate holds details about calls to the ProcessTemplate method.
 		ProcessTemplate []struct {
-			// In1 is the in1 argument value.
-			In1 *tmplv1.Template
-			// In2 is the in2 argument value.
-			In2 map[string]string
-			// In3 is the in3 argument value.
-			In3 TemplateOpt
+			// Template is the template argument value.
+			Template *v1template.Template
+			// StringToString is the stringToString argument value.
+			StringToString map[string]string
+			// TemplateOpt is the templateOpt argument value.
+			TemplateOpt TemplateOpt
 		}
 		// UpdateDC holds details about calls to the UpdateDC method.
 		UpdateDC []struct {
 			// Ns is the ns argument value.
 			Ns string
 			// Dc is the dc argument value.
-			Dc *appsv1.DeploymentConfig
+			Dc *v14.DeploymentConfig
 		}
 	}
+	lockDelete          sync.RWMutex
+	lockGetDC           sync.RWMutex
+	lockGetPod          sync.RWMutex
+	lockProcessTemplate sync.RWMutex
+	lockUpdateDC        sync.RWMutex
 }
 
 // Delete calls DeleteFunc.
@@ -120,9 +117,9 @@ func (mock *OSClientInterfaceMock) Delete(ns string, label string) error {
 		Ns:    ns,
 		Label: label,
 	}
-	lockOSClientInterfaceMockDelete.Lock()
+	mock.lockDelete.Lock()
 	mock.calls.Delete = append(mock.calls.Delete, callInfo)
-	lockOSClientInterfaceMockDelete.Unlock()
+	mock.lockDelete.Unlock()
 	return mock.DeleteFunc(ns, label)
 }
 
@@ -137,14 +134,14 @@ func (mock *OSClientInterfaceMock) DeleteCalls() []struct {
 		Ns    string
 		Label string
 	}
-	lockOSClientInterfaceMockDelete.RLock()
+	mock.lockDelete.RLock()
 	calls = mock.calls.Delete
-	lockOSClientInterfaceMockDelete.RUnlock()
+	mock.lockDelete.RUnlock()
 	return calls
 }
 
 // GetDC calls GetDCFunc.
-func (mock *OSClientInterfaceMock) GetDC(ns string, dcName string) (appsv1.DeploymentConfig, error) {
+func (mock *OSClientInterfaceMock) GetDC(ns string, dcName string) (v14.DeploymentConfig, error) {
 	if mock.GetDCFunc == nil {
 		panic("OSClientInterfaceMock.GetDCFunc: method is nil but OSClientInterface.GetDC was just called")
 	}
@@ -155,9 +152,9 @@ func (mock *OSClientInterfaceMock) GetDC(ns string, dcName string) (appsv1.Deplo
 		Ns:     ns,
 		DcName: dcName,
 	}
-	lockOSClientInterfaceMockGetDC.Lock()
+	mock.lockGetDC.Lock()
 	mock.calls.GetDC = append(mock.calls.GetDC, callInfo)
-	lockOSClientInterfaceMockGetDC.Unlock()
+	mock.lockGetDC.Unlock()
 	return mock.GetDCFunc(ns, dcName)
 }
 
@@ -172,9 +169,9 @@ func (mock *OSClientInterfaceMock) GetDCCalls() []struct {
 		Ns     string
 		DcName string
 	}
-	lockOSClientInterfaceMockGetDC.RLock()
+	mock.lockGetDC.RLock()
 	calls = mock.calls.GetDC
-	lockOSClientInterfaceMockGetDC.RUnlock()
+	mock.lockGetDC.RUnlock()
 	return calls
 }
 
@@ -190,9 +187,9 @@ func (mock *OSClientInterfaceMock) GetPod(ns string, dc string) (v1.Pod, error) 
 		Ns: ns,
 		Dc: dc,
 	}
-	lockOSClientInterfaceMockGetPod.Lock()
+	mock.lockGetPod.Lock()
 	mock.calls.GetPod = append(mock.calls.GetPod, callInfo)
-	lockOSClientInterfaceMockGetPod.Unlock()
+	mock.lockGetPod.Unlock()
 	return mock.GetPodFunc(ns, dc)
 }
 
@@ -207,66 +204,66 @@ func (mock *OSClientInterfaceMock) GetPodCalls() []struct {
 		Ns string
 		Dc string
 	}
-	lockOSClientInterfaceMockGetPod.RLock()
+	mock.lockGetPod.RLock()
 	calls = mock.calls.GetPod
-	lockOSClientInterfaceMockGetPod.RUnlock()
+	mock.lockGetPod.RUnlock()
 	return calls
 }
 
 // ProcessTemplate calls ProcessTemplateFunc.
-func (mock *OSClientInterfaceMock) ProcessTemplate(in1 *tmplv1.Template, in2 map[string]string, in3 TemplateOpt) ([]runtime.RawExtension, error) {
+func (mock *OSClientInterfaceMock) ProcessTemplate(template *v1template.Template, stringToString map[string]string, templateOpt TemplateOpt) ([]runtime.RawExtension, error) {
 	if mock.ProcessTemplateFunc == nil {
 		panic("OSClientInterfaceMock.ProcessTemplateFunc: method is nil but OSClientInterface.ProcessTemplate was just called")
 	}
 	callInfo := struct {
-		In1 *tmplv1.Template
-		In2 map[string]string
-		In3 TemplateOpt
+		Template       *v1template.Template
+		StringToString map[string]string
+		TemplateOpt    TemplateOpt
 	}{
-		In1: in1,
-		In2: in2,
-		In3: in3,
+		Template:       template,
+		StringToString: stringToString,
+		TemplateOpt:    templateOpt,
 	}
-	lockOSClientInterfaceMockProcessTemplate.Lock()
+	mock.lockProcessTemplate.Lock()
 	mock.calls.ProcessTemplate = append(mock.calls.ProcessTemplate, callInfo)
-	lockOSClientInterfaceMockProcessTemplate.Unlock()
-	return mock.ProcessTemplateFunc(in1, in2, in3)
+	mock.lockProcessTemplate.Unlock()
+	return mock.ProcessTemplateFunc(template, stringToString, templateOpt)
 }
 
 // ProcessTemplateCalls gets all the calls that were made to ProcessTemplate.
 // Check the length with:
 //     len(mockedOSClientInterface.ProcessTemplateCalls())
 func (mock *OSClientInterfaceMock) ProcessTemplateCalls() []struct {
-	In1 *tmplv1.Template
-	In2 map[string]string
-	In3 TemplateOpt
+	Template       *v1template.Template
+	StringToString map[string]string
+	TemplateOpt    TemplateOpt
 } {
 	var calls []struct {
-		In1 *tmplv1.Template
-		In2 map[string]string
-		In3 TemplateOpt
+		Template       *v1template.Template
+		StringToString map[string]string
+		TemplateOpt    TemplateOpt
 	}
-	lockOSClientInterfaceMockProcessTemplate.RLock()
+	mock.lockProcessTemplate.RLock()
 	calls = mock.calls.ProcessTemplate
-	lockOSClientInterfaceMockProcessTemplate.RUnlock()
+	mock.lockProcessTemplate.RUnlock()
 	return calls
 }
 
 // UpdateDC calls UpdateDCFunc.
-func (mock *OSClientInterfaceMock) UpdateDC(ns string, dc *appsv1.DeploymentConfig) error {
+func (mock *OSClientInterfaceMock) UpdateDC(ns string, dc *v14.DeploymentConfig) error {
 	if mock.UpdateDCFunc == nil {
 		panic("OSClientInterfaceMock.UpdateDCFunc: method is nil but OSClientInterface.UpdateDC was just called")
 	}
 	callInfo := struct {
 		Ns string
-		Dc *appsv1.DeploymentConfig
+		Dc *v14.DeploymentConfig
 	}{
 		Ns: ns,
 		Dc: dc,
 	}
-	lockOSClientInterfaceMockUpdateDC.Lock()
+	mock.lockUpdateDC.Lock()
 	mock.calls.UpdateDC = append(mock.calls.UpdateDC, callInfo)
-	lockOSClientInterfaceMockUpdateDC.Unlock()
+	mock.lockUpdateDC.Unlock()
 	return mock.UpdateDCFunc(ns, dc)
 }
 
@@ -275,14 +272,14 @@ func (mock *OSClientInterfaceMock) UpdateDC(ns string, dc *appsv1.DeploymentConf
 //     len(mockedOSClientInterface.UpdateDCCalls())
 func (mock *OSClientInterfaceMock) UpdateDCCalls() []struct {
 	Ns string
-	Dc *appsv1.DeploymentConfig
+	Dc *v14.DeploymentConfig
 } {
 	var calls []struct {
 		Ns string
-		Dc *appsv1.DeploymentConfig
+		Dc *v14.DeploymentConfig
 	}
-	lockOSClientInterfaceMockUpdateDC.RLock()
+	mock.lockUpdateDC.RLock()
 	calls = mock.calls.UpdateDC
-	lockOSClientInterfaceMockUpdateDC.RUnlock()
+	mock.lockUpdateDC.RUnlock()
 	return calls
 }

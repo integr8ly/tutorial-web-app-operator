@@ -16,7 +16,7 @@ func LoadKubernetesResourceFromFile(path string) (runtime.Object, error) {
 		return nil, err
 	}
 
-	data, err = JsonIfYaml(data, path)
+	data, err = JSONIfYaml(data, path)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +35,7 @@ func LoadKubernetesResource(jsonData []byte) (runtime.Object, error) {
 	return k8sutil.RuntimeObjectFromUnstructured(&u)
 }
 
-func JsonIfYaml(source []byte, filename string) ([]byte, error) {
+func JSONIfYaml(source []byte, filename string) ([]byte, error) {
 	if strings.HasSuffix(filename, ".yaml") || strings.HasSuffix(filename, ".yml") {
 		return yaml.ToJSON(source)
 	}

@@ -8,41 +8,37 @@ import (
 	"sync"
 )
 
-var (
-	lockSdkCruderMockCreate sync.RWMutex
-	lockSdkCruderMockDelete sync.RWMutex
-	lockSdkCruderMockGet    sync.RWMutex
-	lockSdkCruderMockList   sync.RWMutex
-	lockSdkCruderMockUpdate sync.RWMutex
-)
+// Ensure, that SdkCruderMock does implement SdkCruder.
+// If this is not the case, regenerate this file with moq.
+var _ SdkCruder = &SdkCruderMock{}
 
 // SdkCruderMock is a mock implementation of SdkCruder.
 //
-//     func TestSomethingThatUsesSdkCruder(t *testing.T) {
+// 	func TestSomethingThatUsesSdkCruder(t *testing.T) {
 //
-//         // make and configure a mocked SdkCruder
-//         mockedSdkCruder := &SdkCruderMock{
-//             CreateFunc: func(object sdk.Object) error {
-// 	               panic("mock out the Create method")
-//             },
-//             DeleteFunc: func(object sdk.Object, opts ...sdk.DeleteOption) error {
-// 	               panic("mock out the Delete method")
-//             },
-//             GetFunc: func(object sdk.Object, opts ...sdk.GetOption) error {
-// 	               panic("mock out the Get method")
-//             },
-//             ListFunc: func(namespace string, into sdk.Object, opts ...sdk.ListOption) error {
-// 	               panic("mock out the List method")
-//             },
-//             UpdateFunc: func(object sdk.Object) error {
-// 	               panic("mock out the Update method")
-//             },
-//         }
+// 		// make and configure a mocked SdkCruder
+// 		mockedSdkCruder := &SdkCruderMock{
+// 			CreateFunc: func(object sdk.Object) error {
+// 				panic("mock out the Create method")
+// 			},
+// 			DeleteFunc: func(object sdk.Object, opts ...sdk.DeleteOption) error {
+// 				panic("mock out the Delete method")
+// 			},
+// 			GetFunc: func(object sdk.Object, opts ...sdk.GetOption) error {
+// 				panic("mock out the Get method")
+// 			},
+// 			ListFunc: func(namespace string, into sdk.Object, opts ...sdk.ListOption) error {
+// 				panic("mock out the List method")
+// 			},
+// 			UpdateFunc: func(object sdk.Object) error {
+// 				panic("mock out the Update method")
+// 			},
+// 		}
 //
-//         // use mockedSdkCruder in code that requires SdkCruder
-//         // and then make assertions.
+// 		// use mockedSdkCruder in code that requires SdkCruder
+// 		// and then make assertions.
 //
-//     }
+// 	}
 type SdkCruderMock struct {
 	// CreateFunc mocks the Create method.
 	CreateFunc func(object sdk.Object) error
@@ -95,6 +91,11 @@ type SdkCruderMock struct {
 			Object sdk.Object
 		}
 	}
+	lockCreate sync.RWMutex
+	lockDelete sync.RWMutex
+	lockGet    sync.RWMutex
+	lockList   sync.RWMutex
+	lockUpdate sync.RWMutex
 }
 
 // Create calls CreateFunc.
@@ -107,9 +108,9 @@ func (mock *SdkCruderMock) Create(object sdk.Object) error {
 	}{
 		Object: object,
 	}
-	lockSdkCruderMockCreate.Lock()
+	mock.lockCreate.Lock()
 	mock.calls.Create = append(mock.calls.Create, callInfo)
-	lockSdkCruderMockCreate.Unlock()
+	mock.lockCreate.Unlock()
 	return mock.CreateFunc(object)
 }
 
@@ -122,9 +123,9 @@ func (mock *SdkCruderMock) CreateCalls() []struct {
 	var calls []struct {
 		Object sdk.Object
 	}
-	lockSdkCruderMockCreate.RLock()
+	mock.lockCreate.RLock()
 	calls = mock.calls.Create
-	lockSdkCruderMockCreate.RUnlock()
+	mock.lockCreate.RUnlock()
 	return calls
 }
 
@@ -140,9 +141,9 @@ func (mock *SdkCruderMock) Delete(object sdk.Object, opts ...sdk.DeleteOption) e
 		Object: object,
 		Opts:   opts,
 	}
-	lockSdkCruderMockDelete.Lock()
+	mock.lockDelete.Lock()
 	mock.calls.Delete = append(mock.calls.Delete, callInfo)
-	lockSdkCruderMockDelete.Unlock()
+	mock.lockDelete.Unlock()
 	return mock.DeleteFunc(object, opts...)
 }
 
@@ -157,9 +158,9 @@ func (mock *SdkCruderMock) DeleteCalls() []struct {
 		Object sdk.Object
 		Opts   []sdk.DeleteOption
 	}
-	lockSdkCruderMockDelete.RLock()
+	mock.lockDelete.RLock()
 	calls = mock.calls.Delete
-	lockSdkCruderMockDelete.RUnlock()
+	mock.lockDelete.RUnlock()
 	return calls
 }
 
@@ -175,9 +176,9 @@ func (mock *SdkCruderMock) Get(object sdk.Object, opts ...sdk.GetOption) error {
 		Object: object,
 		Opts:   opts,
 	}
-	lockSdkCruderMockGet.Lock()
+	mock.lockGet.Lock()
 	mock.calls.Get = append(mock.calls.Get, callInfo)
-	lockSdkCruderMockGet.Unlock()
+	mock.lockGet.Unlock()
 	return mock.GetFunc(object, opts...)
 }
 
@@ -192,9 +193,9 @@ func (mock *SdkCruderMock) GetCalls() []struct {
 		Object sdk.Object
 		Opts   []sdk.GetOption
 	}
-	lockSdkCruderMockGet.RLock()
+	mock.lockGet.RLock()
 	calls = mock.calls.Get
-	lockSdkCruderMockGet.RUnlock()
+	mock.lockGet.RUnlock()
 	return calls
 }
 
@@ -212,9 +213,9 @@ func (mock *SdkCruderMock) List(namespace string, into sdk.Object, opts ...sdk.L
 		Into:      into,
 		Opts:      opts,
 	}
-	lockSdkCruderMockList.Lock()
+	mock.lockList.Lock()
 	mock.calls.List = append(mock.calls.List, callInfo)
-	lockSdkCruderMockList.Unlock()
+	mock.lockList.Unlock()
 	return mock.ListFunc(namespace, into, opts...)
 }
 
@@ -231,9 +232,9 @@ func (mock *SdkCruderMock) ListCalls() []struct {
 		Into      sdk.Object
 		Opts      []sdk.ListOption
 	}
-	lockSdkCruderMockList.RLock()
+	mock.lockList.RLock()
 	calls = mock.calls.List
-	lockSdkCruderMockList.RUnlock()
+	mock.lockList.RUnlock()
 	return calls
 }
 
@@ -247,9 +248,9 @@ func (mock *SdkCruderMock) Update(object sdk.Object) error {
 	}{
 		Object: object,
 	}
-	lockSdkCruderMockUpdate.Lock()
+	mock.lockUpdate.Lock()
 	mock.calls.Update = append(mock.calls.Update, callInfo)
-	lockSdkCruderMockUpdate.Unlock()
+	mock.lockUpdate.Unlock()
 	return mock.UpdateFunc(object)
 }
 
@@ -262,8 +263,8 @@ func (mock *SdkCruderMock) UpdateCalls() []struct {
 	var calls []struct {
 		Object sdk.Object
 	}
-	lockSdkCruderMockUpdate.RLock()
+	mock.lockUpdate.RLock()
 	calls = mock.calls.Update
-	lockSdkCruderMockUpdate.RUnlock()
+	mock.lockUpdate.RUnlock()
 	return calls
 }
