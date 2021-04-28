@@ -128,7 +128,7 @@ func TestJsonIfYaml(t *testing.T) {
 			}
 		}
 
-		_, err := JsonIfYaml(content, tc.FilePath)
+		_, err := JSONIfYaml(content, tc.FilePath)
 
 		if tc.ExpectError && err == nil {
 			t.Fatalf("expected an error but got none")

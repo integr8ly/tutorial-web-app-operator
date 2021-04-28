@@ -91,7 +91,7 @@ func TestTemplate_Process(t *testing.T) {
 				if err != nil {
 					t.Fatalf("Could not find template file %v", err)
 				}
-				jsonData, err := JsonIfYaml(rawData, tp)
+				jsonData, err := JSONIfYaml(rawData, tp)
 				if err != nil {
 					t.Fatalf("Could not find template file %v", err)
 				}

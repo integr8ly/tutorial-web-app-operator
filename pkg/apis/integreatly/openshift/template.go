@@ -12,12 +12,12 @@ import (
 func NewTemplate(namespace string, inConfig *rest.Config, opts TemplateOpt) (*Template, error) {
 	config := rest.CopyConfig(inConfig)
 	config.GroupVersion = &schema.GroupVersion{
-		Group:   opts.ApiGroup,
-		Version: opts.ApiVersion,
+		Group:   opts.APIGroup,
+		Version: opts.APIVersion,
 	}
-	config.APIPath = opts.ApiPath
-	config.AcceptContentTypes = opts.ApiMimetype
-	config.ContentType = opts.ApiMimetype
+	config.APIPath = opts.APIPath
+	config.AcceptContentTypes = opts.APIMimetype
+	config.ContentType = opts.APIMimetype
 
 	config.NegotiatedSerializer = basicNegotiatedSerializer{}
 	if config.UserAgent == "" {
@@ -47,7 +47,7 @@ func (template *Template) Process(tmpl *v1template.Template, params map[string]s
 		Post().
 		Namespace(template.namespace).
 		Body(resource).
-		Resource(opts.ApiResource).
+		Resource(opts.APIResource).
 		Do()
 
 	if result.Error() == nil {

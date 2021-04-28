@@ -44,7 +44,7 @@ func init() {
 	metav1.AddToGroupVersion(deleteScheme, versionV1)
 }
 
-var watchJsonSerializerInfo = runtime.SerializerInfo{
+var watchJSONSerializerInfo = runtime.SerializerInfo{
 	MediaType:        "application/json",
 	EncodesAsText:    true,
 	Serializer:       json.NewSerializer(json.DefaultMetaFactory, watchScheme, watchScheme, false),
@@ -62,7 +62,7 @@ type watchNegotiatedSerializer struct{}
 var watchNegotiatedSerializerInstance = watchNegotiatedSerializer{}
 
 func (s watchNegotiatedSerializer) SupportedMediaTypes() []runtime.SerializerInfo {
-	return []runtime.SerializerInfo{watchJsonSerializerInfo}
+	return []runtime.SerializerInfo{watchJSONSerializerInfo}
 }
 
 func (s watchNegotiatedSerializer) EncoderForVersion(encoder runtime.Encoder, gv runtime.GroupVersioner) runtime.Encoder {
