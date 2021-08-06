@@ -18,8 +18,8 @@ setup/dep:
 	curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 	@echo setup complete
 
-.PHONY: setup/travis
-setup/travis:
+.PHONY: setup/jenkins
+setup/jenkins:
 	@echo Installing Operator SDK
 	@curl -Lo operator-sdk https://github.com/operator-framework/operator-sdk/releases/download/v0.0.7/operator-sdk-v0.0.7-x86_64-linux-gnu && chmod +x operator-sdk && sudo mv operator-sdk /usr/local/bin/
 
