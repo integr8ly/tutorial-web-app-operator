@@ -1,4 +1,4 @@
-FROM alpine:3.6
+FROM quay.io/jitesoft/alpine:3.11
 
 RUN adduser -D tutorial-web-app-operator
 USER tutorial-web-app-operator
