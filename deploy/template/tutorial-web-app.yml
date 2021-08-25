@@ -114,7 +114,7 @@ objects:
                   value: ${INSTALLED_SERVICES}
                 - name: INSTALLATION_TYPE
                   value: ${INSTALLATION_TYPE}
-              image: quay.io/integreatly/tutorial-web-app:2.28.1
+              image: quay.io/integreatly/tutorial-web-app:8.2.3
               imagePullPolicy: Always
               name: tutorial-web-app
               ports:
